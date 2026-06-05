@@ -1,0 +1,92 @@
+2026-06-05 00:28:53.515 Uvicorn server started on 0.0.0.0:8502
+2026-06-05 00:30:06.086 Thread 'ThreadPoolExecutor-2_0': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:06.088 Thread 'ThreadPoolExecutor-2_1': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:06.089 Thread 'ThreadPoolExecutor-2_2': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:06.090 Thread 'ThreadPoolExecutor-2_3': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:06.091 Thread 'ThreadPoolExecutor-2_4': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:06.092 Thread 'ThreadPoolExecutor-2_5': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:08.513 Thread 'ThreadPoolExecutor-2_0': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:09.578 Thread 'ThreadPoolExecutor-2_1': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:10.545 Thread 'ThreadPoolExecutor-2_2': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:11.491 Thread 'ThreadPoolExecutor-2_3': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:12.148 Thread 'ThreadPoolExecutor-2_4': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-06-05 00:30:18.571 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:18.597 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:18.634 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:18.645 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:18.650 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:18.659 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:18.681 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:18.689 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:20.767 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:21.241 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:21.978 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:21.992 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:23.108 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:28.889 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:28.929 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2026-06-05 00:30:28.938 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.

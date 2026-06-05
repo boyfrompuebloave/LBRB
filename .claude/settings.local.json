@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Start-Process powershell -ArgumentList \"-NoProfile -Command `\"cd C:\\\\dashboard; streamlit run dashboard.py --server.port 8501 --server.headless true 2>&1 | Out-File C:\\\\dashboard\\\\streamlit.log`\"\" -WindowStyle Hidden; Start-Sleep -Seconds 5; Get-Content C:\\\\dashboard\\\\streamlit.log -ErrorAction SilentlyContinue)",
+      "PowerShell(streamlit run *)",
+      "PowerShell(Receive-Job *)",
+      "PowerShell(Get-Job *)",
+      "PowerShell(python -m streamlit --version; python -c \"import sys; print\\(sys.executable\\)\")",
+      "PowerShell(Start-Sleep -Seconds 8; Invoke-WebRequest -Uri \"http://localhost:8501\" -UseBasicParsing -TimeoutSec 5 | Select-Object -ExpandProperty StatusCode)",
+      "PowerShell(Read-File *)",
+      "PowerShell(python -c \"import playwright; print\\('ok'\\)\" 2>&1)",
+      "PowerShell(python -m pip install playwright -q; python -m playwright install chromium 2>&1 | Select-Object -Last 5)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8501\" -UseBasicParsing -TimeoutSec 5 | Select-Object -ExpandProperty StatusCode)"
+    ]
+  }
+}
