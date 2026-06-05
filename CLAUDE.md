@@ -31,9 +31,10 @@ Run command: `py -m streamlit run dashboard.py`
 
 ---
 
-## API Keys (hardcoded in dashboard.py)
-- `FRED_API_KEY` = `545e08e147daf33a86840642f4dd8b2f`
-- `REB_API_KEY` = `29401f124ae44e13bb874ff5df08368e` (data.go.kr)
+## API Keys (.env 파일로 관리)
+- `.env` 파일에 저장 (`dashboard/.env`) — `.gitignore`로 커밋 제외
+- `FRED_API_KEY` — FRED API
+- `REB_API_KEY` — R-ONE 한국부동산원 API
 
 ---
 

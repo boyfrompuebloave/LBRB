@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -7,17 +8,20 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from fredapi import Fred
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dotenv import load_dotenv
+
+load_dotenv()
 
 st.set_page_config(page_title="Economic Dashboard", layout="wide")
 st.title("📊 Economic Dashboard")
 st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
 # ── FRED API setup ────────────────────────────────────
-FRED_API_KEY = "545e08e147daf33a86840642f4dd8b2f"
+FRED_API_KEY = os.getenv("FRED_API_KEY")
 fred = Fred(api_key=FRED_API_KEY)
 
 # ── 한국부동산원 API key (data.go.kr) ─────────────────
-REB_API_KEY = "29401f124ae44e13bb874ff5df08368e"
+REB_API_KEY = os.getenv("REB_API_KEY")
 
 @st.cache_data(ttl=3600)
 def get_fred_data(series_id, start_date=None, end_date=None):
