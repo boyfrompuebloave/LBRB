@@ -73,6 +73,7 @@ Run command: `py -m streamlit run dashboard.py`
 - `@st.cache_data` 제거 또는 TTL 변경 금지 (성능에 직결)
 - API key 변경 금지
 - 한 번에 여러 섹션 동시 수정 금지
+- **루트에 임시 파일·스크린샷·스크립트 생성 금지** — 반드시 `_work/` 안에서만 생성할 것
 
 ### ✅ 해야 할 것
 - 작업 전 **변경할 함수/라인 번호 먼저 명시**하고 확인받기

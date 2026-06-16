@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Economic Dashboard — 지표 설명서</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #1a1d27;
+    --bg3: #22263a;
+    --border: #2e3250;
+    --text: #e2e8f0;
+    --muted: #8892a4;
+    --accent: #4f8ef7;
+    --accent2: #7c5cbf;
+    --green: #38a169;
+    --red: #e05252;
+    --yellow: #d4a017;
+    --gold: #c9a84c;
+    --teal: #2db5a3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    line-height: 1.7;
+  }
+
+  /* ── 사이드바 ── */
+  #sidebar {
+    width: 260px;
+    min-width: 260px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 24px 0 40px;
+  }
+  #sidebar h2 {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 20px 8px;
+  }
+  #sidebar a {
+    display: block;
+    padding: 5px 20px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.87rem;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  #sidebar a:hover { color: var(--text); background: var(--bg3); }
+  #sidebar a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(79,142,247,0.08); }
+  #sidebar .nav-group { margin-top: 18px; }
+  #sidebar .nav-group-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #55607a;
+    padding: 0 20px 4px;
+  }
+
+  /* ── 본문 ── */
+  #content {
+    flex: 1;
+    max-width: 860px;
+    padding: 48px 52px;
+    overflow-y: auto;
+  }
+  #content h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  #content .subtitle {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin-bottom: 44px;
+  }
+
+  .section { margin-bottom: 64px; }
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-bottom: 16px;
+  }
+  .card-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .card-ticker {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: monospace;
+    background: var(--bg3);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .card-source {
+    font-size: 0.75rem;
+    color: #4a5568;
+    margin-left: auto;
+  }
+
+  .card p { color: #c5cdd8; font-size: 0.93rem; margin-bottom: 10px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .badge {
+    font-size: 0.78rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .badge-green  { background: rgba(56,161,105,0.15); color: #68d391; border: 1px solid rgba(56,161,105,0.3); }
+  .badge-red    { background: rgba(224,82,82,0.15);  color: #fc8181; border: 1px solid rgba(224,82,82,0.3); }
+  .badge-yellow { background: rgba(212,160,23,0.15); color: #f6d45e; border: 1px solid rgba(212,160,23,0.3); }
+  .badge-blue   { background: rgba(79,142,247,0.15); color: #90c2ff; border: 1px solid rgba(79,142,247,0.3); }
+  .badge-gray   { background: rgba(136,146,164,0.15);color: #a0aec0; border: 1px solid rgba(136,146,164,0.3); }
+  .badge-teal   { background: rgba(45,181,163,0.15); color: #81e6d9; border: 1px solid rgba(45,181,163,0.3); }
+
+  .signal-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.88rem; }
+  .signal-table th {
+    text-align: left;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6px 10px;
+    background: var(--bg3);
+  }
+  .signal-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: #c5cdd8; }
+  .signal-table tr:last-child td { border-bottom: none; }
+
+  .highlight {
+    background: rgba(79,142,247,0.08);
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.9rem;
+    color: #a8c4f0;
+    margin: 12px 0;
+  }
+  .warning {
+    background: rgba(212,160,23,0.08);
+    border-left: 3px solid var(--yellow);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.9rem;
+    color: #e5c97a;
+    margin: 12px 0;
+  }
+
+  code { font-family: monospace; background: var(--bg3); padding: 1px 5px; border-radius: 3px; font-size: 0.87em; color: #90c2ff; }
+
+  @media (max-width: 768px) {
+    #sidebar { display: none; }
+    #content { padding: 24px 20px; }
+  }
+
+  /* ── 언어 토글 ── */
+  .lang-en { display: none; }
+  body.lang-en .lang-en { display: block; }
+  body.lang-en .lang-ko { display: none; }
+  span.lang-en { display: none; }
+  body.lang-en span.lang-en { display: inline; }
+  body.lang-en span.lang-ko { display: none; }
+  p.lang-en, tr.lang-en { display: none; }
+  body.lang-en p.lang-en { display: block; }
+  body.lang-en tr.lang-en { display: table-row; }
+  body.lang-en p.lang-ko { display: none; }
+  body.lang-en tr.lang-ko { display: none; }
+
+  #lang-toggle {
+    display: flex;
+    gap: 6px;
+    padding: 0 20px 16px;
+  }
+  #lang-toggle button {
+    flex: 1;
+    padding: 5px 0;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  #lang-toggle button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ 사이드바 ══════════════════ -->
+<nav id="sidebar">
+  <div style="padding:0 20px 12px;font-size:1rem;font-weight:700;color:var(--text);">
+    <span class="lang-ko">📊 지표 설명서</span>
+    <span class="lang-en">📊 Indicator Guide</span>
+  </div>
+  <div id="lang-toggle">
+    <button id="btn-ko" onclick="setLang('ko')">한국어</button>
+    <button id="btn-en" onclick="setLang('en')">English</button>
+  </div>
+
+  <div class="nav-group">
+    <a href="#quick-start" style="font-weight:700;color:var(--accent)">
+      <span class="lang-ko">🚀 빠른 시작 가이드</span>
+      <span class="lang-en">🚀 Quick Start Guide</span>
+    </a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">💱 환율</span><span class="lang-en">💱 Exchange Rates</span></div>
+    <a href="#usdkrw" style="padding-left:28px">USD/KRW</a>
+    <a href="#dxy" style="padding-left:28px"><span class="lang-ko">DXY 달러 인덱스</span><span class="lang-en">DXY Dollar Index</span></a>
+    <a href="#fx" style="padding-left:28px">EUR/KRW · USD/JPY</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">🥇 원자재</span><span class="lang-en">🥇 Commodities</span></div>
+    <a href="#gold" style="padding-left:28px">Gold / Silver</a>
+    <a href="#gold-silver-ratio" style="padding-left:28px">Gold/Silver Ratio</a>
+    <a href="#copper-gold" style="padding-left:28px">Copper/Gold Ratio</a>
+    <a href="#commodity" style="padding-left:28px"><span class="lang-ko">WTI · 구리 · 천연가스</span><span class="lang-en">WTI · Copper · Nat Gas</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">🌏 글로벌 지수</span><span class="lang-en">🌏 Global Indices</span></div>
+    <a href="#sp500" style="padding-left:28px">S&amp;P 500</a>
+    <a href="#nasdaq" style="padding-left:28px">NASDAQ</a>
+    <a href="#sox" style="padding-left:28px"><span class="lang-ko">SOX 반도체</span><span class="lang-en">SOX Semiconductors</span></a>
+    <a href="#vix" style="padding-left:28px"><span class="lang-ko">😨 VIX 공포지수</span><span class="lang-en">😨 VIX Fear Index</span></a>
+    <a href="#bitcoin" style="padding-left:28px">Bitcoin</a>
+    <a href="#global-index" style="padding-left:28px">Nikkei · DAX · Shanghai</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">🇰🇷 한국 지수</span><span class="lang-en">🇰🇷 Korean Indices</span></div>
+    <a href="#kr-index"><span class="lang-ko">KOSPI / KOSDAQ / 삼성</span><span class="lang-en">KOSPI / KOSDAQ / Samsung</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">📊 채권 & 금리</span><span class="lang-en">📊 Bonds & Rates</span></div>
+    <a href="#us10y" style="padding-left:28px">US 10Y Yield</a>
+    <a href="#yield-curve" style="padding-left:28px"><span class="lang-ko">Yield Curve 역전</span><span class="lang-en">Yield Curve Inversion</span></a>
+    <a href="#fed-rate" style="padding-left:28px">Fed Funds Rate</a>
+    <a href="#bond" style="padding-left:28px">US 30Y Yield</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">⚠️ 신용 & 유동성</span><span class="lang-en">⚠️ Credit & Liquidity</span></div>
+    <a href="#spread"><span class="lang-ko">신용 스프레드 (HY · IG)</span><span class="lang-en">Credit Spreads (HY · IG)</span></a>
+    <a href="#fed-liq"><span class="lang-ko">💧 Fed 유동성</span><span class="lang-en">💧 Fed Liquidity</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">📈 경기 & 물가</span><span class="lang-en">📈 Economy & Inflation</span></div>
+    <a href="#leading"><span class="lang-ko">경기선행지수</span><span class="lang-en">Leading Indicators</span></a>
+    <a href="#us-macro"><span class="lang-ko">미국 매크로 (CPI·PCE·M2)</span><span class="lang-en">US Macro (CPI·PCE·M2)</span></a>
+    <a href="#us-housing"><span class="lang-ko">🏠 미국 주택</span><span class="lang-en">🏠 US Housing</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">🇰🇷 한국 지표</span><span class="lang-en">🇰🇷 Korea Indicators</span></div>
+    <a href="#kr-macro"><span class="lang-ko">📊 한국 거시경제</span><span class="lang-en">📊 Korea Macroeconomics</span></a>
+    <a href="#kr-realty"><span class="lang-ko">🏢 한국 부동산</span><span class="lang-en">🏢 Korea Real Estate</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">Phase 고정 섹션</span><span class="lang-en">Fixed Phase Sections</span></div>
+    <a href="#phase1">📌 Phase 1 — Global</a>
+    <a href="#phase2">📌 Phase 2 — US Macro</a>
+    <a href="#phase3">📌 Phase 3 — Korea</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"><span class="lang-ko">기타</span><span class="lang-en">More</span></div>
+    <a href="#correlation"><span class="lang-ko">🔗 지표 간 상관관계</span><span class="lang-en">🔗 Cross-Indicator Correlations</span></a>
+    <a href="#chart-guide"><span class="lang-ko">🔧 Master Chart 사용법</span><span class="lang-en">🔧 Master Chart Guide</span></a>
+    <a href="#release-schedule"><span class="lang-ko">📅 지표 발표 일정</span><span class="lang-en">📅 Release Schedule</span></a>
+  </div>
+</nav>
+
+<!-- ══════════════════ 본문 ══════════════════ -->
+<main id="content">
+
+<h1>Economic Dashboard</h1>
+<p class="subtitle">
+  <span class="lang-ko">지표 설명서 — 각 토글 및 섹션의 의미, 해석 방법, 투자 활용법</span>
+  <span class="lang-en">Indicator Guide — What each toggle and section means, how to interpret it, and how to apply it</span>
+</p>
+
+<!-- ════════════════════════════════ 빠른 시작 ════ -->
+<section class="section" id="quick-start">
+  <div class="section-title">
+    <span class="lang-ko">🚀 빠른 시작 — 5분 오리엔테이션</span>
+    <span class="lang-en">🚀 Quick Start — 5-Minute Orientation</span>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">대시보드 구조</span>
+      <span class="card-title lang-en">Dashboard Structure</span>
+    </div>
+    <div class="lang-ko">
+      <p>이 대시보드는 크게 <strong>Master Chart</strong>와 <strong>Phase 1~3 고정 섹션</strong>으로 나뉜다.</p>
+      <table class="signal-table">
+        <tr><th>영역</th><th>목적</th><th>기간 설정</th></tr>
+        <tr><td><strong>📊 Master Chart</strong></td><td>원하는 지표를 자유롭게 조합해 비교</td><td>프리셋 또는 날짜 직접 입력</td></tr>
+        <tr><td><strong>📌 Phase 1 — Global</strong></td><td>환율·금·주요 지수·VIX·유가 스냅샷</td><td>사이드바 기간 선택기</td></tr>
+        <tr><td><strong>📌 Phase 2 — US Macro</strong></td><td>연준 금리·CPI·M2·GDP·DXY</td><td>사이드바 기간 선택기</td></tr>
+        <tr><td><strong>📌 Phase 3 — Korea</strong></td><td>한국 금리·CPI·부동산·KOSPI/KOSDAQ</td><td>사이드바 기간 선택기</td></tr>
+      </table>
+    </div>
+    <div class="lang-en">
+      <p>The dashboard is divided into the <strong>Master Chart</strong> and <strong>Phase 1–3 fixed sections</strong>.</p>
+      <table class="signal-table">
+        <tr><th>Area</th><th>Purpose</th><th>Period</th></tr>
+        <tr><td><strong>📊 Master Chart</strong></td><td>Freely combine and compare any indicators</td><td>Preset or custom date range</td></tr>
+        <tr><td><strong>📌 Phase 1 — Global</strong></td><td>FX, Gold, major indices, VIX, Oil snapshot</td><td>Sidebar period selector</td></tr>
+        <tr><td><strong>📌 Phase 2 — US Macro</strong></td><td>Fed rate, CPI, M2, GDP, DXY</td><td>Sidebar period selector</td></tr>
+        <tr><td><strong>📌 Phase 3 — Korea</strong></td><td>Korea rate, CPI, real estate, KOSPI/KOSDAQ</td><td>Sidebar period selector</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">처음 열었다면 — 이 순서로 보세요</span>
+      <span class="card-title lang-en">First Time? Follow These Steps</span>
+    </div>
+    <div class="lang-ko">
+      <p><strong>Step 1</strong> — Phase 1에서 <strong>USD/KRW</strong>와 <strong>VIX</strong>를 먼저 확인. 원화 약세 + VIX 상승이 동시에 나타나면 글로벌 위험 회피 국면.</p>
+      <p><strong>Step 2</strong> — Phase 2에서 <strong>연준 금리 vs CPI</strong> 위치 파악. 금리가 CPI보다 높으면 실질 긴축 중, 낮으면 아직 완화적.</p>
+      <p><strong>Step 3</strong> — Phase 3에서 <strong>KOSPI/KOSDAQ</strong> 상태와 방향 확인. 한국 시장이 글로벌과 동행하는지, 아니면 따로 움직이는지 파악.</p>
+      <p><strong>Step 4</strong> — Master Chart로 관심 지표들을 겹쳐서 확인. 기준점 슬라이더로 특정 사건(금리 인상 시작, 침체 시작 등)을 100으로 맞춰 상대 수익률 비교.</p>
+      <div class="highlight">Master Chart에서 가장 먼저 켜볼 추천 조합: <strong>S&P 500 + KOSPI + SOX 반도체 + Yield Curve</strong> (기간 5년, 경기침체 음영 ON). 한국 시장과 반도체 사이클의 관계를 한눈에 볼 수 있다.</div>
+    </div>
+    <div class="lang-en">
+      <p><strong>Step 1</strong> — In Phase 1, check <strong>USD/KRW</strong> and <strong>VIX</strong> first. If KRW weakens while VIX rises simultaneously, the market is in a global risk-off mode.</p>
+      <p><strong>Step 2</strong> — In Phase 2, gauge the <strong>Fed Rate vs CPI</strong> position. If the rate exceeds CPI, real tightening is occurring; if lower, policy remains accommodative.</p>
+      <p><strong>Step 3</strong> — In Phase 3, check <strong>KOSPI/KOSDAQ</strong> direction. Determine whether the Korean market is tracking global moves or diverging.</p>
+      <p><strong>Step 4</strong> — Use the Master Chart to overlay indicators. Use the baseline slider to set a specific event (e.g., first rate hike, recession start) to 100 and compare relative returns.</p>
+      <div class="highlight">Recommended first combo in Master Chart: <strong>S&P 500 + KOSPI + SOX + Yield Curve</strong> (5-year period, recession shading ON). Instantly shows how the Korean market tracks the semiconductor cycle.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">현재 매크로 사이클 판단 체크리스트</span>
+      <span class="card-title lang-en">Macro Cycle Assessment Checklist</span>
+    </div>
+    <div class="lang-ko">
+      <table class="signal-table">
+        <tr><th>체크 항목</th><th>확인할 지표</th><th>우호적 신호</th><th>경계 신호</th></tr>
+        <tr><td>금리 사이클</td><td>Fed Funds Rate 방향</td><td>인하 중 / 인하 기대</td><td>인상 중 / 동결 장기화</td></tr>
+        <tr><td>인플레이션</td><td>CPI YoY vs 2%</td><td>2% 근접·하향</td><td>3% 이상 지속</td></tr>
+        <tr><td>경기 상태</td><td>Yield Curve · Jobless Claims · GDP</td><td>수익률 곡선 정상화</td><td>역전 지속 + 실업 상승</td></tr>
+        <tr><td>유동성</td><td>Net Liquidity · M2 YoY</td><td>순유동성 증가</td><td>M2 YoY 마이너스</td></tr>
+        <tr><td>시장 심리</td><td>VIX · HY 스프레드</td><td>VIX 20 이하, 스프레드 축소</td><td>VIX 30+, 스프레드 확대</td></tr>
+      </table>
+      <div class="highlight">5개 항목이 모두 우호적(금리 인하 + CPI 안정 + 경기 확장 + 유동성 풍부 + 낙관)인 상태를 <strong>"골디락스"</strong>라고 한다. 역사적으로 이 환경에서 위험자산이 가장 강한 상승세를 보였다. 현재 몇 개가 우호적인지 세어보자.</div>
+    </div>
+    <div class="lang-en">
+      <table class="signal-table">
+        <tr><th>Check Item</th><th>Indicator</th><th>Bullish Signal</th><th>Warning Signal</th></tr>
+        <tr><td>Rate Cycle</td><td>Fed Funds Rate direction</td><td>Cutting / Cut expected</td><td>Hiking / Extended pause</td></tr>
+        <tr><td>Inflation</td><td>CPI YoY vs 2%</td><td>Near/below 2%</td><td>Persistently above 3%</td></tr>
+        <tr><td>Economy</td><td>Yield Curve · Jobless Claims · GDP</td><td>Curve normalizing</td><td>Inversion + rising unemployment</td></tr>
+        <tr><td>Liquidity</td><td>Net Liquidity · M2 YoY</td><td>Net liquidity expanding</td><td>M2 YoY negative</td></tr>
+        <tr><td>Sentiment</td><td>VIX · HY Spread</td><td>VIX below 20, spreads tightening</td><td>VIX 30+, spreads widening</td></tr>
+      </table>
+      <div class="highlight">When all 5 are bullish (rate cuts + stable CPI + expansion + ample liquidity + optimism), it is called <strong>"Goldilocks."</strong> Historically this environment produces the strongest risk-asset rallies. Count how many are currently favorable.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 환율 ════ -->
+<section class="section" id="fx">
+  <div class="section-title">
+    <span class="lang-ko">💱 환율 (Exchange Rate)</span>
+    <span class="lang-en">💱 Exchange Rates</span>
+  </div>
+
+  <div class="card" id="usdkrw">
+    <div class="card-header">
+      <span class="card-title lang-ko">USD/KRW — 달러/원 환율</span>
+      <span class="card-title lang-en">USD/KRW — US Dollar / Korean Won</span>
+      <span class="card-ticker">USDKRW=X</span>
+    </div>
+    <div class="lang-ko">
+      <p>1달러를 사는 데 필요한 원화 금액. 가장 기본적인 한국 경제 체온계다. 한국은 수출 주도 경제이므로 환율은 기업 실적과 물가 모두에 직결된다.</p>
+      <p><strong>왜 오르나?</strong> 달러 수요가 원화 수요보다 클 때 — 미국 금리 인상, 글로벌 위험 회피(안전자산 달러 매수), 한국 경상수지 악화, 외국인 자금 이탈 등.</p>
+      <p><strong>왜 내리나?</strong> 원화 강세 — 한국 수출 호조로 달러 공급 증가, 외국인 주식·채권 매수, 미국 금리 인하 기대.</p>
+      <table class="signal-table">
+        <tr><th>환율 구간</th><th>의미</th><th>주요 영향</th></tr>
+        <tr><td>1,250원 이하</td><td>원화 강세</td><td>수출기업 영업이익 감소, 수입물가 하락</td></tr>
+        <tr><td>1,250~1,350원</td><td>보통</td><td>중립적</td></tr>
+        <tr><td>1,350원 이상</td><td>원화 약세</td><td>수출기업 유리, 수입 인플레 압력, 외채 부담 증가</td></tr>
+      </table>
+      <div class="highlight">삼성전자·현대차 같은 수출 대형주는 원화 약세(환율 상승) 시 영업이익이 늘어난다. 반면 항공·정유·식품은 수입 원가가 올라 불리하다.</div>
+    </div>
+    <div class="lang-en">
+      <p>How many Korean won are needed to buy one US dollar — Korea's most fundamental economic barometer. As an export-driven economy, the exchange rate directly affects both corporate earnings and domestic prices.</p>
+      <p><strong>Why it rises:</strong> When dollar demand exceeds won demand — US rate hikes, global risk-off (safe-haven dollar buying), deteriorating current account, foreign capital outflows.</p>
+      <p><strong>Why it falls:</strong> KRW strengthens — strong Korean exports increase dollar supply, foreign buying of Korean stocks/bonds, US rate cut expectations.</p>
+      <table class="signal-table">
+        <tr><th>Rate Level</th><th>Meaning</th><th>Key Impact</th></tr>
+        <tr><td>Below ₩1,250</td><td>KRW Strong</td><td>Export earnings shrink, import prices fall</td></tr>
+        <tr><td>₩1,250–1,350</td><td>Neutral</td><td>Neutral</td></tr>
+        <tr><td>Above ₩1,350</td><td>KRW Weak</td><td>Exporters benefit, import inflation rises, foreign debt burden increases</td></tr>
+      </table>
+      <div class="highlight">Export heavyweights like Samsung and Hyundai see operating profits rise when KRW weakens. Conversely, airlines, refiners, and food companies face higher import costs.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">EUR/KRW — 유로/원 환율</span>
+      <span class="card-title lang-en">EUR/KRW — Euro / Korean Won</span>
+      <span class="card-ticker">EURKRW=X</span>
+    </div>
+    <div class="lang-ko">
+      <p>유로화와 원화 사이의 교환비율. 유럽은 한국의 주요 수출 대상 지역(자동차·전자) 중 하나다. ECB(유럽중앙은행) 금리 결정과 유럽 경기 흐름이 핵심 변수.</p>
+      <p>USD/KRW와 비교해 보면 달러 강세인지 유로 강세인지 파악할 수 있다. EUR/USD 환율과 함께 보면 유럽-미국 경기 상대 강도를 가늠할 수 있다.</p>
+    </div>
+    <div class="lang-en">
+      <p>The exchange rate between the euro and the Korean won. Europe is a major Korean export destination (autos, electronics). ECB rate decisions and European economic trends are the key drivers.</p>
+      <p>Comparing EUR/KRW with USD/KRW reveals whether dollar or euro strength is driving KRW moves. Pairing with EUR/USD shows the relative economic strength between Europe and the US.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">USD/JPY — 달러/엔 환율</span>
+      <span class="card-title lang-en">USD/JPY — US Dollar / Japanese Yen</span>
+      <span class="card-ticker">USDJPY=X</span>
+    </div>
+    <div class="lang-ko">
+      <p>수치가 높을수록 엔화 약세(엔저). 일본은 초저금리 정책으로 오랫동안 엔화 약세를 유지해왔다. 2022년 이후 미국 금리가 급등하면서 미·일 금리 차이가 벌어져 엔저가 심화됐다.</p>
+      <p><strong>왜 중요한가?</strong> 일본은 한국의 최대 경쟁국이다. 엔저가 심해지면 수출 시장에서 한국 제품이 일본 제품에 가격 경쟁력을 잃는다. 또한 엔화는 안전자산이라 글로벌 리스크 오프 시 엔 강세(수치 하락)가 나타난다.</p>
+      <div class="warning">엔/달러가 150 이상이면 일본 당국의 시장 개입 가능성에 주목. BOJ(일본은행) 금리 인상 시 엔화 강세 전환 가능.</div>
+    </div>
+    <div class="lang-en">
+      <p>A higher number means a weaker yen. Japan maintained ultra-low rates for years, keeping the yen weak. After 2022, the widening US-Japan rate differential accelerated yen weakness.</p>
+      <p><strong>Why it matters:</strong> Japan is Korea's top export competitor. A very weak yen makes Japanese goods cheaper, eroding Korean products' price competitiveness. The yen is also a safe-haven currency — during global risk-off events, the yen strengthens (number falls).</p>
+      <div class="warning">Above 150 USD/JPY, watch for potential Japanese government intervention. BOJ rate hikes could trigger a yen reversal.</div>
+    </div>
+  </div>
+
+  <div class="card" id="dxy">
+    <div class="card-header">
+      <span class="card-title lang-ko">DXY — 달러 인덱스</span>
+      <span class="card-title lang-en">DXY — US Dollar Index</span>
+      <span class="card-ticker">DX-Y.NYB</span>
+    </div>
+    <div class="lang-ko">
+      <p>유로(57.6%), 엔(13.6%), 파운드(11.9%), 캐나다달러(9.1%), 스웨덴크로나(4.2%), 스위스프랑(3.6%) 등 6개 통화 대비 달러의 강도를 나타내는 지수. 기준값은 100.</p>
+      <p><strong>100 이상</strong> → 달러 강세. 신흥국 통화 약세, 원자재 가격 하락 압력, 신흥국 달러 부채 부담 증가.</p>
+      <p><strong>100 이하</strong> → 달러 약세. 원자재 가격 상승 경향, 신흥국 자산에 유리.</p>
+      <div class="highlight">DXY는 원/달러 환율과 매우 높은 상관관계를 갖는다. DXY 상승 = 원화 약세가 거의 동시에 일어난다. 금·원유 가격과는 반비례 경향이 강하다.</div>
+      <table class="signal-table">
+        <tr><th>DXY 수준</th><th>판단</th></tr>
+        <tr><td>105 이상</td><td>🔴 강달러 — 신흥국·원자재 부담</td></tr>
+        <tr><td>100~105</td><td>🟡 보통</td></tr>
+        <tr><td>100 이하</td><td>🟢 약달러 — 신흥국·원자재 유리</td></tr>
+      </table>
+    </div>
+    <div class="lang-en">
+      <p>Measures dollar strength against a basket of 6 currencies: EUR (57.6%), JPY (13.6%), GBP (11.9%), CAD (9.1%), SEK (4.2%), CHF (3.6%). Baseline = 100.</p>
+      <p><strong>Above 100</strong> → Strong dollar. EM currency weakness, commodity price pressure, higher EM dollar debt burden.</p>
+      <p><strong>Below 100</strong> → Weak dollar. Commodities tend to rise; favorable for EM assets.</p>
+      <div class="highlight">DXY has a very high correlation with USD/KRW — DXY rising almost always means KRW weakening simultaneously. It also has a strong inverse relationship with gold and oil prices.</div>
+      <table class="signal-table">
+        <tr><th>DXY Level</th><th>Reading</th></tr>
+        <tr><td>Above 105</td><td>🔴 Strong Dollar — headwind for EM and commodities</td></tr>
+        <tr><td>100–105</td><td>🟡 Neutral</td></tr>
+        <tr><td>Below 100</td><td>🟢 Weak Dollar — tailwind for EM and commodities</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 원자재 ════ -->
+<section class="section" id="commodity">
+  <div class="section-title">
+    <span class="lang-ko">🥇 원자재 (Commodities)</span>
+    <span class="lang-en">🥇 Commodities</span>
+  </div>
+
+  <div class="card" id="gold">
+    <div class="card-header">
+      <span class="card-title lang-ko">Gold — 금 가격</span>
+      <span class="card-title lang-en">Gold Price</span>
+      <span class="card-ticker">GC=F (USD/oz)</span>
+    </div>
+    <div class="lang-ko">
+      <p>인류 역사상 가장 오래된 가치 저장 수단. 중앙은행이 찍어내지 못하고, 공급이 제한적이며, 수천 년간 가치를 유지해왔다.</p>
+      <p><strong>금이 오르는 경우</strong></p>
+      <p>① 실질금리 하락 — 금은 이자를 주지 않으므로 실질금리가 낮을수록 보유 기회비용이 줄어든다.</p>
+      <p>② 달러 약세 — 금은 달러로 표시되므로 달러가 약해지면 금값이 오른다.</p>
+      <p>③ 지정학적 위기, 금융 불안 — 전쟁, 은행 위기, 경기침체 우려 시 안전자산으로 수요 급증.</p>
+      <p>④ 중앙은행 매수 — 특히 신흥국 중앙은행들이 달러 의존도를 줄이기 위해 금을 비축.</p>
+      <div class="highlight">금과 실질금리(10년 국채 − 기대인플레이션)는 역방향이 강하다. 실질금리가 음수(-) 구간에서 금이 강세를 보이는 경향이 있다.</div>
+    </div>
+    <div class="lang-en">
+      <p>Humanity's oldest store of value. Cannot be printed by central banks, supply is limited, and it has held value for millennia.</p>
+      <p><strong>Gold rises when:</strong></p>
+      <p>① Real rates fall (lower nominal rates or higher inflation) — gold pays no interest, so lower real rates reduce the opportunity cost of holding it.</p>
+      <p>② Dollar weakens — gold is priced in dollars, so a weaker dollar pushes prices higher.</p>
+      <p>③ Geopolitical crises, financial stress — wars, banking crises, or recession fears spike safe-haven demand.</p>
+      <p>④ Central bank buying — especially EM central banks diversifying away from dollar reserves.</p>
+      <div class="highlight">Gold has a strong inverse relationship with real rates (10Y yield − breakeven inflation). Gold tends to outperform when real rates are negative.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Silver — 은 가격</span>
+      <span class="card-title lang-en">Silver Price</span>
+      <span class="card-ticker">SI=F (USD/oz)</span>
+    </div>
+    <div class="lang-ko">
+      <p>은은 금과 달리 산업용 수요(전자제품·태양광 패널·전기차 배선·의료기기)가 전체 수요의 절반 이상을 차지한다. 따라서 은은 <strong>안전자산 + 경기 민감 원자재</strong>의 이중 성격을 갖는다.</p>
+      <p>경기가 좋을 때는 금보다 더 많이 오르고, 위기 때는 금보다 더 많이 내리는 경향이 있다. 변동성이 금의 2~3배 수준이다.</p>
+      <p>태양광·전기차 인프라 확대 → 은 산업 수요 구조적 증가 테마가 있다.</p>
+    </div>
+    <div class="lang-en">
+      <p>Unlike gold, more than half of silver demand is industrial: electronics, solar panels, EV wiring, medical devices. Silver thus has a dual nature: <strong>safe-haven asset + cyclical commodity</strong>.</p>
+      <p>It tends to outperform gold in good times and underperform in crises. Volatility runs 2–3× that of gold.</p>
+      <p>Expanding solar and EV infrastructure creates a structural uptrend in industrial silver demand.</p>
+    </div>
+  </div>
+
+  <div class="card" id="gold-silver-ratio">
+    <div class="card-header">
+      <span class="card-title lang-ko">Gold/Silver Ratio — 금은비율</span>
+      <span class="card-title lang-en">Gold/Silver Ratio</span>
+    </div>
+    <div class="lang-ko">
+      <p>금 가격을 은 가격으로 나눈 비율. "금 1온스를 사려면 은이 몇 온스 필요한가"를 나타낸다.</p>
+      <table class="signal-table">
+        <tr><th>비율</th><th>의미</th><th>역사적 맥락</th></tr>
+        <tr><td>80 이상</td><td>은이 상대적으로 저평가 (또는 위험회피 심리 강함)</td><td>역사적 고점 구간, 위기 때 자주 나타남</td></tr>
+        <tr><td>50~70</td><td>역사적 평균 구간</td><td>정상 범위</td></tr>
+        <tr><td>50 이하</td><td>은이 상대적으로 고평가 (경기 호황, 위험선호)</td><td>경기 확장기에 나타남</td></tr>
+      </table>
+      <div class="highlight">코로나 팬데믹 직후 2020년 3월 비율이 120을 돌파했다. 이 시점이 지나고 은이 폭발적으로 반등했다. 역사적으로 금은비율 극단값에서 반대 방향 투자 아이디어를 찾는 트레이더들이 많다.</div>
+    </div>
+    <div class="lang-en">
+      <p>Gold price divided by silver price — "how many ounces of silver to buy one ounce of gold."</p>
+      <table class="signal-table">
+        <tr><th>Ratio</th><th>Meaning</th><th>Historical Context</th></tr>
+        <tr><td>Above 80</td><td>Silver relatively cheap (or strong risk-off sentiment)</td><td>Historical peak zone, common during crises</td></tr>
+        <tr><td>50–70</td><td>Historical average range</td><td>Normal</td></tr>
+        <tr><td>Below 50</td><td>Silver relatively expensive (risk-on, expansion)</td><td>Appears during economic expansions</td></tr>
+      </table>
+      <div class="highlight">In March 2020, the ratio surpassed 120 — silver then rebounded explosively. Traders historically look for contrarian trade ideas at ratio extremes.</div>
+    </div>
+  </div>
+
+  <div class="card" id="copper-gold">
+    <div class="card-header">
+      <span class="card-title lang-ko">Copper/Gold Ratio — 구리/금 비율 (경기 기대 지수)</span>
+      <span class="card-title lang-en">Copper/Gold Ratio — Economic Expectations Gauge</span>
+    </div>
+    <div class="lang-ko">
+      <p>구리 가격을 금 가격으로 나눈 비율. 구리는 산업·경기 민감 원자재, 금은 안전자산이므로 이 비율은 <strong>"시장이 경기 확장을 얼마나 기대하는가"</strong>를 나타낸다.</p>
+      <p><strong>비율 상승</strong> → 경기 확장 기대, 위험 선호. <strong>비율 하락</strong> → 경기 둔화 우려, 위험 회피.</p>
+      <p>10년물 국채 금리와 구리/금 비율은 역사적으로 높은 상관관계를 보인다.</p>
+    </div>
+    <div class="lang-en">
+      <p>Copper price divided by gold price. Copper is cyclical/industrial; gold is a safe haven. The ratio therefore measures <strong>"how much the market expects economic expansion."</strong></p>
+      <p><strong>Ratio rising</strong> → copper strong / gold weak → expansion expected, risk-on. <strong>Ratio falling</strong> → gold strong / copper weak → slowdown fears, risk-off.</p>
+      <p>Historically tracks the 10Y Treasury yield closely — when both point in the same direction, the signal is more reliable.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">WTI Crude Oil — 서부 텍사스산 원유</span>
+      <span class="card-title lang-en">WTI Crude Oil</span>
+      <span class="card-ticker">CL=F (USD/bbl)</span>
+    </div>
+    <div class="lang-ko">
+      <p>미국 원유 가격의 기준이 되는 선물 지수. 세계 원유 가격의 벤치마크로 사용된다.</p>
+      <p>① OPEC+ 감산·증산 결정 ② 글로벌 경기 상황 ③ 달러 강약 ④ 지정학적 위기 ⑤ 미국 원유 재고량(EIA 주간 발표)</p>
+      <div class="highlight">한국은 에너지 순수입국이므로 유가 상승 → 경상수지 악화 → 원화 약세 → CPI 상승의 경로가 나타난다.</div>
+    </div>
+    <div class="lang-en">
+      <p>The benchmark US crude oil futures contract, used as a global oil price reference.</p>
+      <p>Key drivers: ① OPEC+ production decisions ② Global demand (economy) ③ Dollar strength ④ Geopolitical events ⑤ US crude inventories (EIA weekly)</p>
+      <div class="highlight">Korea is a net energy importer: rising oil → worse current account → KRW weakens → CPI rises. Directly impacts refiners, airlines, and logistics companies.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Copper — 구리 (닥터 구리)</span>
+      <span class="card-title lang-en">Copper — "Dr. Copper"</span>
+      <span class="card-ticker">HG=F (USD/lb)</span>
+    </div>
+    <div class="lang-ko">
+      <p>"닥터 구리(Dr. Copper)"라는 별명이 있다. 전선, 건설, 자동차, 전기차, 반도체 장비 등 거의 모든 산업에 쓰이기 때문에, 구리 수요는 전 세계 실물 경기 상태를 그대로 반영한다고 여겨진다.</p>
+      <p>주식 시장보다 2~3개월 선행하는 경향이 있다. 특히 중국이 전 세계 구리 소비량의 약 55%를 차지해 중국 경기와 상관관계가 높다.</p>
+    </div>
+    <div class="lang-en">
+      <p>Nicknamed "Dr. Copper" because it is used in virtually every industry — wiring, construction, autos, EVs, semiconductor equipment — making copper demand a real-time proxy for global economic health.</p>
+      <p>Some research suggests it leads equity markets by 2–3 months. China accounts for ~55% of global copper consumption, so Chinese industrial and construction activity is the dominant driver.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Natural Gas — 천연가스</span>
+      <span class="card-title lang-en">Natural Gas</span>
+      <span class="card-ticker">NG=F (USD/MMBtu)</span>
+    </div>
+    <div class="lang-ko">
+      <p>발전·난방·산업용 에너지원. 계절성이 강해 여름(냉방)과 겨울(난방)에 가격이 오르는 경향이 있다.</p>
+      <p>2022년 러시아-우크라이나 전쟁으로 유럽 LNG 수요 급증, 가격 역사적 고점 기록. 이후 대체 공급원 확보로 안정. 미국 LNG 수출 확대 → 글로벌 가스 가격 연동성 증가 추세.</p>
+    </div>
+    <div class="lang-en">
+      <p>Energy source for power generation, heating, and industry. Strong seasonality — prices tend to rise in summer (cooling) and winter (heating).</p>
+      <p>The 2022 Russia-Ukraine war sent European LNG demand surging to record highs. Prices have since stabilized as alternative supplies were secured. US LNG export expansion is increasing global gas price linkage.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 글로벌 지수 ════ -->
+<section class="section" id="global-index">
+  <div class="section-title">
+    <span class="lang-ko">🌏 글로벌 주요 지수</span>
+    <span class="lang-en">🌏 Global Major Indices</span>
+  </div>
+
+  <div class="card" id="sp500">
+    <div class="card-header"><span class="card-title">S&P 500</span><span class="card-ticker">^GSPC</span></div>
+    <div class="lang-ko">
+      <p>미국 시가총액 상위 500개 기업 지수. 미국 주식시장 시총의 약 80% 포괄. 전 세계 기관투자자들이 "글로벌 위험자산의 기준"으로 삼는다.</p>
+      <p>IT(약 30%) > 금융(13%) > 헬스케어(12%) 순. 빅테크 7개사가 전체의 30%를 차지해 <strong>소수 종목 쏠림 현상</strong>이 있다.</p>
+      <div class="highlight">S&P 500 하락 시 전 세계 자산이 동반 하락하는 경향. 한국 KOSPI와의 상관관계가 약 0.7~0.8 수준으로 높다.</div>
+    </div>
+    <div class="lang-en">
+      <p>Index of the 500 largest US-listed companies, covering ~80% of the US equity market cap. The global benchmark for risk assets among institutional investors.</p>
+      <p>Sector weights: IT (~30%) > Financials (13%) > Healthcare (12%). The "Magnificent 7" big-tech stocks account for ~30%, creating significant <strong>concentration risk</strong>.</p>
+      <div class="highlight">When S&P 500 falls, global assets tend to fall in tandem. Correlation with Korea's KOSPI is approximately 0.7–0.8.</div>
+    </div>
+  </div>
+
+  <div class="card" id="nasdaq">
+    <div class="card-header"><span class="card-title">NASDAQ</span><span class="card-ticker">^IXIC</span></div>
+    <div class="lang-ko">
+      <p>기술주·성장주 중심의 미국 지수. S&P 500보다 훨씬 고PER이며, <strong>금리 민감도가 높다.</strong> 성장주 밸류에이션은 미래 이익의 현재가치를 할인하므로, 금리(할인율) 상승 시 하락폭이 S&P 500보다 크다.</p>
+      <p>AI·반도체 슈퍼사이클이 진행될 때는 나스닥이 S&P 500을 크게 상회하는 경향이 있다.</p>
+    </div>
+    <div class="lang-en">
+      <p>US tech/growth-stock index. Trades at much higher P/E multiples than S&P 500, and is <strong>highly sensitive to interest rates</strong>. Growth stock valuations discount future earnings — higher rates (discount rate) hurt them more than S&P 500 components.</p>
+      <p>During AI/semiconductor supercycles, NASDAQ tends to significantly outperform the S&P 500.</p>
+    </div>
+  </div>
+
+  <div class="card" id="sox">
+    <div class="card-header">
+      <span class="card-title lang-ko">SOX — 필라델피아 반도체 지수</span>
+      <span class="card-title lang-en">SOX — Philadelphia Semiconductor Index</span>
+      <span class="card-ticker">^SOX</span>
+    </div>
+    <div class="lang-ko">
+      <p>엔비디아, TSMC, ASML, 인텔, AMD, 퀄컴 등 반도체 설계·제조·장비 기업 30개로 구성.</p>
+      <p><strong>한국 시장과의 관계</strong>: KOSPI에서 삼성전자·SK하이닉스 비중이 크므로 SOX 상승 → KOSPI 동반 상승 경향이 뚜렷하다. 반도체 업황의 선행지표로 SOX를 먼저 보는 것이 일반적이다.</p>
+    </div>
+    <div class="lang-en">
+      <p>30-company index of semiconductor design, manufacturing, and equipment firms: Nvidia, TSMC, ASML, Intel, AMD, Qualcomm, etc.</p>
+      <p><strong>Korea connection:</strong> Samsung and SK Hynix dominate KOSPI weighting; when SOX rises, KOSPI tends to follow. SOX is widely used as a leading indicator for the Korean market.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Nikkei 225 — 일본 닛케이</span>
+      <span class="card-title lang-en">Nikkei 225 — Japan</span>
+      <span class="card-ticker">^N225</span>
+    </div>
+    <div class="lang-ko">
+      <p>일본 도쿄증권거래소 대형주 225개로 구성. <strong>엔화와의 관계</strong>: 엔저 → 수출기업 이익 증가 → 주가 상승. BOJ 금리 인상으로 엔화 강세 전환 시 닛케이는 하락 압력을 받는다.</p>
+      <p>2024년 닛케이는 34년 만에 버블 고점(1989년)을 돌파, 역사적 고점을 기록했다.</p>
+    </div>
+    <div class="lang-en">
+      <p>225 large-cap stocks on the Tokyo Stock Exchange. <strong>Yen relationship:</strong> weak yen → higher export profits → stocks rise. BOJ rate hikes (yen strengthening) put downward pressure on the index.</p>
+      <p>In 2024, Nikkei broke its 1989 bubble high for the first time in 34 years.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">DAX — 독일 주가지수</span>
+      <span class="card-title lang-en">DAX — Germany</span>
+      <span class="card-ticker">^GDAXI</span>
+    </div>
+    <div class="lang-ko">
+      <p>독일 프랑크푸르트 대형주 40개. 자동차·화학·기계 제조업 의존도가 높아 에너지 가격과 글로벌 무역 흐름에 민감하다. ECB 금리 정책과 유로존 경기 지표를 함께 봐야 한다.</p>
+    </div>
+    <div class="lang-en">
+      <p>40 large-cap Frankfurt-listed companies. Heavily weighted toward autos, chemicals, and machinery — highly sensitive to energy prices and global trade. Monitor alongside ECB policy and eurozone economic data.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Shanghai — 상하이 종합지수</span>
+      <span class="card-title lang-en">Shanghai Composite — China</span>
+      <span class="card-ticker">000001.SS</span>
+    </div>
+    <div class="lang-ko">
+      <p>중국 상하이 증권거래소 전체 지수. 외국인 투자 제한·정부 개입으로 글로벌 시장과의 연동성이 낮다. 중국 당국의 경기 부양 정책, 부동산 시장, 소비 데이터에 더 민감하게 반응한다.</p>
+      <p>한국 수출의 25% 이상이 중국으로 향해 상하이 지수 흐름은 한국 기업 실적에도 영향을 준다.</p>
+    </div>
+    <div class="lang-en">
+      <p>All A-share and B-share stocks on the Shanghai Stock Exchange. Foreign investment restrictions and government intervention mean low correlation with global markets — more sensitive to Beijing's stimulus policies, property market conditions, and domestic consumption data.</p>
+      <p>Over 25% of Korean exports go to China, so Shanghai's trend matters for Korean corporate earnings.</p>
+    </div>
+  </div>
+
+  <div class="card" id="vix">
+    <div class="card-header">
+      <span class="card-title lang-ko">😨 VIX — 공포 지수 (변동성 지수)</span>
+      <span class="card-title lang-en">😨 VIX — Fear Index (Volatility Index)</span>
+      <span class="card-ticker">^VIX · CBOE Volatility Index</span>
+    </div>
+    <div class="lang-ko">
+      <p>S&P 500 옵션의 <strong>30일 내재변동성</strong>을 나타내는 지수. 시카고옵션거래소(CBOE)가 산출. 시장 참여자들이 불안해질수록 풋옵션 수요가 늘어 VIX가 상승한다.</p>
+      <table class="signal-table">
+        <tr><th>VIX 수준</th><th>시장 심리</th><th>역사적 사례</th></tr>
+        <tr><td>10~15</td><td>극도의 낙관·자만 (역발상 경계 구간)</td><td>2017년 11 기록</td></tr>
+        <tr><td>15~20</td><td>안정·낙관 (정상 구간)</td><td>평상시</td></tr>
+        <tr><td>20~30</td><td>주의·불안</td><td>조정 시작</td></tr>
+        <tr><td>30~40</td><td>공포</td><td>2011년 신용등급 강등(48)</td></tr>
+        <tr><td>40 이상</td><td>패닉·극단적 공포</td><td>2008년(89), 2020년(85)</td></tr>
+      </table>
+      <div class="highlight"><strong>역발상 관점:</strong> VIX 40~80 폭등 시점은 역사적으로 강력한 저점 매수 신호였다. 2020년 3월 VIX 85 → 이후 S&P 500 100% 반등.</div>
+      <div class="warning"><strong>VIX의 한계:</strong> 동행 지표이므로 하락을 미리 예측할 수 없다. VIX가 낮아도 안심할 수 없다 — 갑자기 폭등하는 경우도 있다. 현재 공포의 강도를 확인하고 역발상 판단의 참고자료로 사용하는 것이 가장 적절하다.</div>
+    </div>
+    <div class="lang-en">
+      <p>Measures the <strong>30-day implied volatility</strong> of S&P 500 options, published by the CBOE. As investors grow anxious they buy more put options (downside protection), raising option premiums and thus VIX.</p>
+      <table class="signal-table">
+        <tr><th>VIX Level</th><th>Market Sentiment</th><th>Historical Examples</th></tr>
+        <tr><td>10–15</td><td>Extreme complacency (contrarian caution zone)</td><td>VIX 11 in 2017, then spiked</td></tr>
+        <tr><td>15–20</td><td>Stable/optimistic (normal range)</td><td>Everyday market</td></tr>
+        <tr><td>20–30</td><td>Caution/anxiety</td><td>Corrections begin</td></tr>
+        <tr><td>30–40</td><td>Fear</td><td>2011 US credit downgrade (48)</td></tr>
+        <tr><td>40+</td><td>Panic / extreme fear</td><td>2008 GFC (89), 2020 COVID (85)</td></tr>
+      </table>
+      <div class="highlight"><strong>Contrarian view:</strong> VIX spikes to 40–80 have historically been powerful buy signals. VIX 85 in March 2020 → S&P 500 rallied 100%+ afterward.</div>
+      <div class="warning"><strong>VIX limitations:</strong> It is a coincident, not leading, indicator — it spikes as crashes happen, not before. Low VIX does not guarantee safety — it can remain low for years then suddenly surge. Best used to gauge the intensity of current fear, not to predict future moves.</div>
+    </div>
+  </div>
+
+  <div class="card" id="bitcoin">
+    <div class="card-header">
+      <span class="card-title">Bitcoin</span>
+      <span class="card-ticker">BTC-USD</span>
+    </div>
+    <div class="lang-ko">
+      <p>2009년 사토시 나카모토가 만든 세계 최초의 탈중앙화 디지털 화폐. 발행량 상한 2,100만 개. 거시경제 분석에서 <strong>유동성 지표</strong>로 활용 — 연준 유동성 확대 시 강세, 긴축기에 하락하는 경향이 나스닥과 유사하다.</p>
+      <p>4년마다 발생하는 <strong>반감기(Halving)</strong>: 신규 채굴량이 절반으로 줄어드는 이벤트. 역사적으로 반감기 이후 1~1.5년 내 강세장이 나타난 패턴이 있다. (2024년 4번째 반감기 완료)</p>
+    </div>
+    <div class="lang-en">
+      <p>World's first decentralized digital currency, created by Satoshi Nakamoto in 2009. Hard supply cap of 21 million coins. Used in macro analysis as a <strong>liquidity indicator</strong> — tends to rally during Fed easing and fall during tightening, similar to NASDAQ.</p>
+      <p>The <strong>Halving</strong> occurs every ~4 years, cutting new supply in half. Historically a bull market has appeared within 1–1.5 years after each halving. (4th halving completed in 2024)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 한국 지수 ════ -->
+<section class="section" id="kr-index">
+  <div class="section-title">
+    <span class="lang-ko">🇰🇷 한국 지수</span>
+    <span class="lang-en">🇰🇷 Korean Indices</span>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">KOSPI — 한국 종합주가지수</span>
+      <span class="card-title lang-en">KOSPI — Korea Composite Stock Price Index</span>
+      <span class="card-ticker">^KS11</span>
+    </div>
+    <div class="lang-ko">
+      <p>1980년 1월 4일 기준 100으로 시작한 한국 유가증권시장 전체 시가총액 지수. 약 830개 상장 기업.</p>
+      <p><strong>구성 쏠림:</strong> 삼성전자(약 20%), SK하이닉스(약 5%) 두 종목만으로 상위 25%를 차지 → 반도체 업황이 KOSPI를 좌우한다. 외국인 비중 약 30%로 글로벌 유동성에 크게 영향을 받는다.</p>
+      <table class="signal-table">
+        <tr><th>주요 레벨</th><th>역사적 의미</th></tr>
+        <tr><td>2,000p 이하</td><td>역사적 저평가 구간</td></tr>
+        <tr><td>2,200~2,800p</td><td>정상 박스권</td></tr>
+        <tr><td>3,000p 이상</td><td>고점 부담 (2021년 최고 3,316p)</td></tr>
+      </table>
+    </div>
+    <div class="lang-en">
+      <p>Full market-cap index of Korea's main stock exchange, starting at 100 on Jan 4, 1980. ~830 listed companies.</p>
+      <p><strong>Concentration risk:</strong> Samsung Electronics (~20%) and SK Hynix (~5%) make up 25% of the index alone — semiconductor cycles dominate KOSPI. Foreign investors hold ~30%, so global liquidity conditions have an outsized impact.</p>
+      <table class="signal-table">
+        <tr><th>Key Level</th><th>Historical Significance</th></tr>
+        <tr><td>Below 2,000p</td><td>Historically undervalued territory</td></tr>
+        <tr><td>2,200–2,800p</td><td>Normal trading range</td></tr>
+        <tr><td>Above 3,000p</td><td>Overbought concern (2021 all-time high: 3,316p)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">KOSDAQ — 코스닥 지수</span>
+      <span class="card-title lang-en">KOSDAQ Index</span>
+      <span class="card-ticker">^KQ11</span>
+    </div>
+    <div class="lang-ko">
+      <p>중소·벤처·성장기업 중심. 바이오·제약, IT·소프트웨어, 2차전지 소재, 엔터테인먼트 기업 비중이 높다. KOSPI보다 변동성이 크고 개인투자자 비중이 높다. 금리 인하 기대 시 KOSPI보다 더 크게 상승하는 경향이 있다.</p>
+    </div>
+    <div class="lang-en">
+      <p>Korea's growth/venture market, heavy in biotech/pharma, IT/software, battery materials, and K-content. More volatile than KOSPI, with higher retail investor participation. Tends to outperform KOSPI during rate-cut expectations due to its growth-stock character.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">삼성전자</span>
+      <span class="card-title lang-en">Samsung Electronics</span>
+      <span class="card-ticker">005930.KS (KRW)</span>
+    </div>
+    <div class="lang-ko">
+      <p>KOSPI 시총 약 20%를 차지하는 한국 최대 기업. 메모리 반도체(D램·낸드), 시스템 반도체(파운드리), 스마트폰, 가전을 모두 아우른다.</p>
+      <p>주가 방향은 AI 서버용 HBM 수요, 스마트폰 교체 사이클, 파운드리 수주 상황에 따라 움직인다. 외국인 보유 비중 약 55% → 달러 강세 시 외국인 차익 실현 매도 경향.</p>
+    </div>
+    <div class="lang-en">
+      <p>Korea's largest company, ~20% of KOSPI market cap. Covers memory semiconductors (DRAM/NAND), foundry, smartphones, and consumer electronics.</p>
+      <p>Key drivers: AI server HBM demand, smartphone upgrade cycles, foundry order wins. Foreign ownership ~55% → dollar strength often triggers foreign profit-taking selling.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 채권 & 금리 ════ -->
+<section class="section" id="bond">
+  <div class="section-title">
+    <span class="lang-ko">📊 채권 & 금리</span>
+    <span class="lang-en">📊 Bonds & Interest Rates</span>
+  </div>
+
+  <div class="card" id="us10y">
+    <div class="card-header">
+      <span class="card-title lang-ko">US 10Y Yield — 미국 10년 국채 금리</span>
+      <span class="card-title lang-en">US 10-Year Treasury Yield</span>
+      <span class="card-ticker">^TNX / FRED: DGS10</span>
+    </div>
+    <div class="lang-ko">
+      <p>전 세계 금융 시스템에서 가장 중요한 단일 지표. 모든 자산(주식·채권·부동산·회사채)의 밸류에이션 할인율로 사용된다.</p>
+      <p>① 주식 — 특히 고PER 성장주(나스닥) 타격. ② 부동산 — 모기지 금리 상승. ③ 회사채 — 기업 조달 비용 상승. ④ 달러 강세 → 신흥국 자금 이탈.</p>
+      <div class="highlight">10년물 금리 = 실질성장 기대 + 기대인플레이션. 금리가 오를 때 "경기 호조" 때문인지 "인플레" 때문인지를 구분하는 것이 중요하다.</div>
+      <table class="signal-table">
+        <tr><th>금리 구간</th><th>시장 영향</th></tr>
+        <tr><td>4% 이상</td><td>성장주 밸류에이션 부담, 모기지 수요 위축</td></tr>
+        <tr><td>3~4%</td><td>경계 구간</td></tr>
+        <tr><td>3% 이하</td><td>유동성 우호, 자산 가격 지지</td></tr>
+      </table>
+    </div>
+    <div class="lang-en">
+      <p>The single most important indicator in global finance — the "risk-free rate" that serves as the discount rate for all asset valuations (equities, bonds, real estate, corporate debt).</p>
+      <p>Rising 10Y yield impacts: ① Stocks — hurts high-P/E growth stocks most. ② Real estate — mortgage rates rise. ③ Corporate bonds — higher borrowing costs. ④ Dollar strengthens → EM capital outflows.</p>
+      <div class="highlight">10Y yield = real growth expectations + inflation expectations. When rates rise, it matters whether it is driven by a strong economy or by inflation — the former is less harmful to stocks.</div>
+      <table class="signal-table">
+        <tr><th>Rate Level</th><th>Market Impact</th></tr>
+        <tr><td>Above 4%</td><td>Growth stock valuation pressure, mortgage demand falls</td></tr>
+        <tr><td>3–4%</td><td>Caution zone</td></tr>
+        <tr><td>Below 3%</td><td>Liquidity-friendly, supports asset prices</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">US 30Y Yield — 미국 30년 국채 금리</span>
+      <span class="card-title lang-en">US 30-Year Treasury Yield</span>
+      <span class="card-ticker">^TYX / FRED: DGS30</span>
+    </div>
+    <div class="lang-ko">
+      <p>30년 장기 국채 금리. 인플레이션 기대가 10년물보다 더 크게 반영된다. 모기지 금리와 매우 높은 상관관계 — 미국 주택 시장 분석 시 핵심 지표다. 2023~2024년 5% 돌파 → 주택 시장 거래량 급감.</p>
+    </div>
+    <div class="lang-en">
+      <p>Long-duration Treasury, reflecting longer-term inflation expectations more than the 10Y. Highly correlated with mortgage rates — a key indicator for the US housing market. Surpassing 5% in 2023–2024 caused a sharp drop in home sales volume.</p>
+    </div>
+  </div>
+
+  <div class="card" id="yield-curve">
+    <div class="card-header">
+      <span class="card-title lang-ko">Yield Curve 10Y-2Y — 장단기 금리 역전</span>
+      <span class="card-title lang-en">Yield Curve 10Y-2Y — Inversion Indicator</span>
+      <span class="card-ticker">FRED: T10Y2Y</span>
+    </div>
+    <div class="lang-ko">
+      <p>10년 국채 금리 − 2년 국채 금리. 정상이면 플러스(+). 0 아래로 내려가면 <strong>역전(Inversion)</strong>.</p>
+      <div class="warning">장단기 금리 역전은 역사적으로 가장 신뢰도 높은 경기침체 선행 지표. 1970년 이후 역전 발생 후 6~24개월 이내에 경기침체가 찾아왔다. 역전 자체가 침체를 일으키는 것이 아니라, 시장이 미래 침체를 선반영하는 것이다.</div>
+      <table class="signal-table">
+        <tr><th>스프레드</th><th>의미</th></tr>
+        <tr><td>+0.5% 이상</td><td>정상 (경기 확장 기대)</td></tr>
+        <tr><td>0 근처</td><td>플래트닝 (불확실성 증가)</td></tr>
+        <tr><td>마이너스</td><td>침체 선행 신호 — 역전 기간이 길수록 강도↑</td></tr>
+      </table>
+    </div>
+    <div class="lang-en">
+      <p>10-year yield minus 2-year yield. Normally positive. When it goes below zero, it is called an <strong>inversion</strong>.</p>
+      <div class="warning">The yield curve inversion is historically one of the most reliable recession leading indicators. Since 1970, every inversion was followed by a recession within 6–24 months. The inversion doesn't cause the recession — it reflects the market pricing in future Fed rate cuts as the economy weakens.</div>
+      <table class="signal-table">
+        <tr><th>Spread</th><th>Meaning</th></tr>
+        <tr><td>+0.5%+</td><td>Normal curve (expansion expected)</td></tr>
+        <tr><td>Near 0</td><td>Flattening (rising uncertainty)</td></tr>
+        <tr><td>Negative</td><td>Recession leading signal — longer inversion = stronger signal</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="fed-rate">
+    <div class="card-header">
+      <span class="card-title lang-ko">Fed Funds Rate — 연준 기준금리</span>
+      <span class="card-title lang-en">Fed Funds Rate — US Policy Rate</span>
+      <span class="card-ticker">FRED: FEDFUNDS</span>
+    </div>
+    <div class="lang-ko">
+      <p>연준(Federal Reserve)이 설정하는 단기 기준금리. 모든 달러 금리(모기지, 회사채 등)의 출발점. FOMC가 연 8회 결정한다.</p>
+      <p><strong>인상</strong> → 인플레 억제, 대출 비용 증가, 달러 강세, 신흥국 자금 이탈. <strong>인하</strong> → 경기 부양, 자산 가격 상승, 달러 약세.</p>
+      <p>연준의 <strong>이중 책무(Dual Mandate)</strong>: 물가 안정(2% 목표) + 최대 고용.</p>
+    </div>
+    <div class="lang-en">
+      <p>The short-term benchmark rate set by the Federal Reserve — the starting point for all dollar-denominated rates (mortgages, corporate bonds, credit cards). Decided by the FOMC at 8 scheduled meetings per year.</p>
+      <p><strong>Hikes</strong> → fight inflation, raise borrowing costs, strengthen dollar, EM capital outflows. <strong>Cuts</strong> → stimulate economy, support asset prices, weaken dollar.</p>
+      <p>The Fed's <strong>Dual Mandate</strong>: price stability (2% inflation target) + maximum employment.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 신용 스프레드 ════ -->
+<section class="section" id="spread">
+  <div class="section-title">
+    <span class="lang-ko">⚠️ 신용 스프레드 (Credit Spread)</span>
+    <span class="lang-en">⚠️ Credit Spreads</span>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">HY Spread — 하이일드(고수익채권) 스프레드</span>
+      <span class="card-title lang-en">HY Spread — High-Yield Credit Spread</span>
+      <span class="card-ticker">FRED: BAMLH0A0HYM2 (OAS, %)</span>
+    </div>
+    <div class="lang-ko">
+      <p>투기등급(BB 이하) 회사채 금리 − 미국 국채 금리. <strong>확대</strong> → 기업 부도 위험 상승 인식, 주식 하락 선행 신호. <strong>축소</strong> → 신용 환경 개선, 위험 선호.</p>
+      <table class="signal-table">
+        <tr><th>HY 스프레드</th><th>시장 상태</th></tr>
+        <tr><td>3% 미만</td><td>과열 (위험 과소평가)</td></tr>
+        <tr><td>3~5%</td><td>보통</td></tr>
+        <tr><td>5~8%</td><td>스트레스 — 주의</td></tr>
+        <tr><td>8% 이상</td><td>위기 (2008년 20%+, 코로나 11%+)</td></tr>
+      </table>
+      <div class="highlight">주가가 아직 안 빠졌는데 HY 스프레드가 빠르게 확대되면 경고 신호다.</div>
+    </div>
+    <div class="lang-en">
+      <p>Yield on sub-investment-grade (BB and below) corporate bonds minus US Treasury yield. <strong>Widening</strong> → market sees rising default risk, leading indicator for equity declines. <strong>Tightening</strong> → improving credit conditions, risk-on.</p>
+      <table class="signal-table">
+        <tr><th>HY Spread</th><th>Market Condition</th></tr>
+        <tr><td>Below 3%</td><td>Overheated (risk underpriced)</td></tr>
+        <tr><td>3–5%</td><td>Normal</td></tr>
+        <tr><td>5–8%</td><td>Stress — caution</td></tr>
+        <tr><td>Above 8%</td><td>Crisis (2008 GFC: 20%+; COVID: 11%+)</td></tr>
+      </table>
+      <div class="highlight">If HY spreads widen rapidly while equities haven't fallen yet, treat it as an early warning signal.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">IG Spread — 투자등급 채권 스프레드</span>
+      <span class="card-title lang-en">IG Spread — Investment-Grade Credit Spread</span>
+      <span class="card-ticker">FRED: BAMLC0A0CM (OAS, %)</span>
+    </div>
+    <div class="lang-ko">
+      <p>BBB 이상 투자등급 회사채 금리 − 미국 국채 금리. 금융 스트레스 해소 시 IG 스프레드가 먼저 좁혀지고 이후 HY가 따라오는 패턴. HY와 함께 보면 신용 시장 전체의 건강 상태를 파악할 수 있다.</p>
+    </div>
+    <div class="lang-en">
+      <p>Yield on investment-grade (BBB and above) corporate bonds minus Treasuries. IG spreads typically stabilize before HY spreads during recoveries — a sign financial stress is easing. Watching both HY and IG together gives a fuller picture of credit market health.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ Fed 유동성 ════ -->
+<section class="section" id="fed-liq">
+  <div class="section-title"><span class="lang-ko">💧 Fed 유동성 (Federal Reserve Liquidity)</span><span class="lang-en">💧 Fed Liquidity</span></div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Fed 총자산 — 연준 대차대조표</span>
+      <span class="card-title lang-en">Fed Total Assets — Balance Sheet</span>
+      <span class="card-ticker">FRED: WALCL (USD millions)</span>
+    </div>
+    <div class="lang-ko">
+    <p>연준이 보유한 자산의 총합. 주로 미국 국채와 MBS로 구성. 수치 증가 = 연준이 채권 매입으로 돈을 풀었다는 뜻.</p>
+    <p><strong>QE</strong>: 채권 매입 → 대차대조표 확대 → 유동성 증가, 위험자산 상승.</p>
+    <p><strong>QT</strong>: 보유 채권 만기/매각 → 대차대조표 축소 → 유동성 감소.</p>
+    <table class="signal-table"><tr><th>시기</th><th>규모</th></tr><tr><td>2008년 이전</td><td>~$0.9조</td></tr><tr><td>2020년 코로나 QE</td><td>$9조 돌파</td></tr><tr><td>2022~ QT</td><td>$7조대로 축소</td></tr></table>
+    </div>
+    <div class="lang-en">
+    <p>Total assets held by the Fed (mainly Treasuries and MBS). Growth = Fed bought bonds and injected money into markets.</p>
+    <p><strong>QE:</strong> Bond purchases → balance sheet expands → liquidity up, risk assets rise.</p>
+    <p><strong>QT:</strong> Bonds mature/are sold → balance sheet shrinks → liquidity drains.</p>
+    <table class="signal-table"><tr><th>Period</th><th>Scale</th></tr><tr><td>Pre-2008 GFC</td><td>~$0.9T</td></tr><tr><td>2020 COVID QE</td><td>Peaked $9T+</td></tr><tr><td>2022+ QT</td><td>Reduced to ~$7T</td></tr></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Reverse Repo — 역레포(RRP)</span>
+      <span class="card-title lang-en">Reverse Repo (RRP)</span>
+      <span class="card-ticker">FRED: RRPONTSYD (USD billions)</span>
+    </div>
+    <div class="lang-ko"><p>"시중에 갈 곳 없는 과잉 유동성이 연준 창고에 쌓인 금액". <strong>RRP 증가</strong> → 유동성 풍부하나 위험자산으로 미이동. <strong>RRP 감소</strong> → 돈이 시장으로 이동 → 실질적 유동성 공급. 2022~2023년 $2.5조까지 증가 후 2024년 급감 → 주식·채권 시장에 유동성 공급.</p></div>
+    <div class="lang-en"><p>Overnight facility where financial institutions park excess cash at the Fed. Think of it as "excess liquidity sitting in the Fed's warehouse." <strong>RRP rising</strong> → ample liquidity but not yet flowing to risk assets. <strong>RRP falling</strong> → money exits Fed and enters markets. RRP peaked at $2.5T (2022–23), then dropped sharply in 2024, channeling liquidity into markets.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Net Liquidity — 순유동성</span>
+      <span class="card-title lang-en">Net Liquidity — Fed Net Liquidity</span>
+    </div>
+    <div class="lang-ko"><p>계산식: <code>WALCL − RRPONTSYD − TGA(WTREGEN)</code>. 실제로 금융 시장에 공급되는 순수 유동성 추정치. <strong>상승</strong> → 위험자산 상승 경향. <strong>하락</strong> → 자산 가격 하락 압력.</p><div class="highlight">비트코인·나스닥과 상관관계가 높다. 단, 인과관계보다는 유동성 풍부 시 위험 선호가 높아지는 간접 효과다.</div></div>
+    <div class="lang-en"><p>Formula: <code>WALCL − RRPONTSYD − TGA(WTREGEN)</code>. Estimates liquidity that actually reaches financial markets. <strong>Rising</strong> → more money in markets, risk assets tend to gain. <strong>Falling</strong> → liquidity drains, asset price pressure.</p><div class="highlight">Studies show high correlation between Fed net liquidity and Bitcoin/NASDAQ — an indirect effect: abundant liquidity raises risk appetite.</div></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 경기선행지수 ════ -->
+<section class="section" id="leading">
+  <div class="section-title"><span class="lang-ko">📈 경기선행지수 (Leading Economic Indicators)</span><span class="lang-en">📈 Leading Economic Indicators</span></div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Initial Jobless Claims — 주간 신규 실업급여 청구 건수</span>
+      <span class="card-title lang-en">Initial Jobless Claims</span>
+      <span class="card-ticker">FRED: ICSA (thousands)</span>
+    </div>
+    <div class="lang-ko"><p>매주 목요일 발표. 처음으로 실업급여를 신청한 사람 수. <strong>수치 증가</strong> → 해고 시작, 경기 하강 신호. <strong>감소/낮은 수준 유지</strong> → 고용 시장 견고.</p></div>
+    <div class="lang-en"><p>Released every Thursday — first-time unemployment insurance filers. <strong>Rising claims</strong> → companies starting layoffs, economic slowdown signal. <strong>Low/falling claims</strong> → resilient labor market.</p></div>
+    <div class="lang-ko"><table class="signal-table"><tr><th>수준</th><th>판단</th></tr><tr><td>20만 이하</td><td>견조한 노동 시장</td></tr><tr><td>20~25만</td><td>정상</td></tr><tr><td>25~30만</td><td>주의</td></tr><tr><td>30만 이상</td><td>경기 둔화 신호</td></tr></table></div>
+    <div class="lang-en"><table class="signal-table"><tr><th>Level</th><th>Reading</th></tr><tr><td>Below 200K</td><td>Strong labor market (historically low)</td></tr><tr><td>200–250K</td><td>Normal</td></tr><tr><td>250–300K</td><td>Caution</td></tr><tr><td>Above 300K</td><td>Slowdown signal</td></tr></table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Nonfarm Payroll — 비농업 고용자 수</span>
+      <span class="card-title lang-en">Nonfarm Payroll</span>
+      <span class="card-ticker">FRED: PAYEMS (thousands)</span>
+    </div>
+    <div class="lang-ko"><p>매월 첫째 주 금요일 발표되는 "고용보고서"의 핵심 지표. <strong>예상치 상회</strong> → 경기 호조, 금리 인하 기대 약화 → 달러 강세. <strong>하회</strong> → 고용 둔화, 금리 인하 기대 강화. 월 15만 명 이상 증가를 건전한 수준으로 봄.</p></div>
+    <div class="lang-en"><p>Core of the monthly "Jobs Report," released the first Friday of each month. <strong>Beat expectations</strong> → strong economy, rate-cut bets fade → dollar strengthens. <strong>Miss expectations</strong> → slowdown, rate-cut bets rise → dollar weakens. Economists generally consider 150K+/month additions as healthy (absorbs new labor force entrants).</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Consumer Sentiment — 소비자심리지수 (미시간대)</span>
+      <span class="card-title lang-en">Consumer Sentiment (Univ. of Michigan)</span>
+      <span class="card-ticker">FRED: UMCSENT</span>
+    </div>
+    <div class="lang-ko"><p>미시간대학 월간 소비자 신뢰 지수. 미국 경제의 70%가 소비이므로 소비 심리는 실제 지출과 직결. <strong>수치 하락</strong> → 소비 둔화 선행 신호. 역사적으로 급락 후 3~6개월 뒤 실제 소비 감소가 나타남.</p></div>
+    <div class="lang-en"><p>Monthly consumer confidence survey from the University of Michigan. Since ~70% of the US economy is consumption, this directly links to actual spending. <strong>Falling readings</strong> → consumers tightening wallets → leading indicator for retail sales slowdown. Historically, a sharp drop leads actual consumption decline by 3–6 months.</p></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 미국 주택 ════ -->
+<section class="section" id="us-housing">
+  <div class="section-title"><span class="lang-ko">🏠 미국 주택 시장</span><span class="lang-en">🏠 US Housing Market</span></div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Housing Starts — 주택 착공 건수</span>
+      <span class="card-title lang-en">Housing Starts</span>
+      <span class="card-ticker">FRED: HOUST (thousands, annualized)</span>
+    </div>
+    <div class="lang-ko"><p>신규 주거 건물 공사 착공 건수(연율). 30년 모기지 금리 7% 초과 시 수요 급감. 2022~2023년 금리 급등으로 착공 큰 폭 감소.</p><table class="signal-table"><tr><th>착공 수준</th><th>의미</th></tr><tr><td>150만 이상</td><td>활황</td></tr><tr><td>120~150만</td><td>보통</td></tr><tr><td>100만 이하</td><td>침체 수준</td></tr></table></div>
+    <div class="lang-en"><p>Number of new residential construction projects started (annualized). Highly sensitive to mortgage rates — when 30Y mortgages exceed 7%, housing demand drops sharply. The 2022–2023 rate surge caused a significant decline in starts.</p><table class="signal-table"><tr><th>Level</th><th>Meaning</th></tr><tr><td>Above 1.5M</td><td>Booming</td></tr><tr><td>1.2–1.5M</td><td>Normal</td></tr><tr><td>Below 1.0M</td><td>Recessionary</td></tr></table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Building Permits — 건축 허가 건수</span>
+      <span class="card-title lang-en">Building Permits</span>
+      <span class="card-ticker">FRED: PERMIT</span>
+    </div>
+    <div class="lang-ko"><p>착공보다 1~2개월 선행하는 지표. Conference Board LEI 10개 구성 요소 중 하나. 허가 대비 착공 비율 하락 → 건설업 심리 악화 신호.</p></div>
+    <div class="lang-en"><p>Leads housing starts by 1–2 months and is one of the 10 components of the Conference Board LEI. If the permits-to-starts ratio falls, builders are delaying projects — a sign of weakening construction sentiment.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">30Y Mortgage Rate — 30년 고정 모기지 금리</span>
+      <span class="card-title lang-en">30-Year Fixed Mortgage Rate</span>
+      <span class="card-ticker">FRED: MORTGAGE30US (%)</span>
+    </div>
+    <div class="lang-ko"><p>미국 주택 담보 대출의 가장 일반적 형태. 10년물 국채 금리에 150~200bp 스프레드를 더한 수준. 2020~21년 역사적 저점 3%대 → 2023년 8% 육박 → 2024년 6.5~7% 수준.</p><div class="warning"><strong>Lock-in Effect:</strong> 기존 보유자들이 낮은 금리의 기존 대출을 지키려 집을 안 팔게 됨 → 공급 감소 + 거래량 감소 → 이상한 고점 시장 형성.</div></div>
+    <div class="lang-en"><p>The most common US home loan product — 30-year fixed rate, typically priced at 150–200bps above the 10Y Treasury. Fell to historic lows (3%) in 2020–21, surged to near 8% in 2023, and settled around 6.5–7% in 2024.</p><div class="warning"><strong>Lock-in Effect:</strong> Existing homeowners refuse to sell to keep their low-rate loans, shrinking supply. Result: fewer listings, fewer transactions, and an unusual market stuck near price peaks.</div></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 미국 매크로 ════ -->
+<section class="section" id="us-macro">
+  <div class="section-title"><span class="lang-ko">🏦 미국 거시경제 지표</span><span class="lang-en">🏦 US Macroeconomic Indicators</span></div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">US CPI — 미국 소비자물가지수 (YoY %)</span>
+      <span class="card-title lang-en">US CPI — Consumer Price Index (YoY%)</span>
+      <span class="card-ticker">FRED: CPIAUCSL</span>
+    </div>
+    <div class="lang-ko"><p>약 200개 품목의 가격 변화 추적. 연준 공식 인플레 목표 2%. CPI 발표는 매월 중순 — 예상치 이탈 시 즉각적인 시장 영향.</p><table class="signal-table"><tr><th>CPI YoY</th><th>연준 반응</th></tr><tr><td>2% 이하</td><td>금리 인하 여건</td></tr><tr><td>2~3%</td><td>목표 근접, 경계</td></tr><tr><td>3%+</td><td>금리 인상/동결 압력</td></tr><tr><td>5%+</td><td>공격적 긴축</td></tr></table></div>
+    <div class="lang-en"><p>Tracks price changes in ~200 household items. Fed's inflation target is 2%. Released mid-month — surprises cause immediate moves in bonds, stocks, and the dollar.</p><table class="signal-table"><tr><th>CPI YoY</th><th>Fed Reaction</th></tr><tr><td>Below 2%</td><td>Rate cut conditions forming</td></tr><tr><td>2–3%</td><td>Near target, vigilant</td></tr><tr><td>Above 3%</td><td>Hike or extended hold pressure</td></tr><tr><td>Above 5%</td><td>Aggressive tightening (2022–23)</td></tr></table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">PCE YoY — 개인소비지출 물가지수 (Fed 공식 타겟)</span>
+      <span class="card-title lang-en">PCE YoY — Fed's Official Inflation Target</span>
+      <span class="card-ticker">FRED: PCEPI</span>
+    </div>
+    <div class="lang-ko"><p>연준이 공식 목표 물가 지표로 삼는 지수. CPI와 달리 ① 대체 효과 반영 ② 의료비 등 간접 지출 포함 → CPI보다 0.3~0.5%p 낮게 나오는 경향. 연준이 "2% 목표"를 말할 때는 PCE 기준이다.</p></div>
+    <div class="lang-en"><p>The Fed's official inflation target measure. Unlike CPI: ① reflects substitution behavior (consumers switching to cheaper alternatives) ② includes medical costs paid by insurers, etc. → typically runs 0.3–0.5%pt below CPI. When the Fed says "2% target," it means PCE.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">PPI YoY — 생산자물가지수</span>
+      <span class="card-title lang-en">PPI YoY — Producer Price Index</span>
+      <span class="card-ticker">FRED: PPIACO</span>
+    </div>
+    <div class="lang-ko"><p>기업들이 생산·유통 단계에서 받는 가격의 변화. PPI → CPI에 2~3개월 선행하는 경향. <strong>PPI 상승 → 기업 비용 증가 → 소비자 가격 전가 → 향후 CPI 상승 압력</strong>의 경로. 단, 마진 축소나 생산성 향상으로 전가 못 할 수도 있다.</p></div>
+    <div class="lang-en"><p>Tracks prices received by producers at the production/distribution stage. PPI typically leads CPI by 2–3 months. <strong>PPI rising → higher business costs → passed to consumer prices → upward CPI pressure</strong>. However, if firms absorb costs via margin compression or productivity gains, PPI may not translate to CPI.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">Breakeven Inflation — 기대 인플레이션</span>
+      <span class="card-title lang-en">Breakeven Inflation — Market-Implied Inflation Expectation</span>
+      <span class="card-ticker">FRED: T10YIE (%)</span>
+    </div>
+    <div class="lang-ko"><p>10년물 국채 금리 − 10년 TIPS 금리 = 시장이 예상하는 향후 10년 평균 물가 상승률. <strong>기대인플레이션 상승</strong> → 연준이 금리를 더 높이 유지해야 한다는 압박. <strong>하락</strong> → 인플레 안정화 기대, 금리 인하 여건. 2%에 안착 → 연준 신뢰도 바로미터.</p></div>
+    <div class="lang-en"><p>10Y nominal Treasury yield minus 10Y TIPS yield = the market's forecast for average inflation over the next 10 years. <strong>Rising</strong> → pressure on the Fed to keep rates higher. <strong>Falling</strong> → inflation stabilizing, conditions forming for rate cuts. Anchored near 2% = the Fed is credible.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">실업률 (Unemployment Rate)</span>
+      <span class="card-title lang-en">Unemployment Rate</span>
+      <span class="card-ticker">FRED: UNRATE (%)</span>
+    </div>
+    <div class="lang-ko"><p>실업자 수 ÷ 경제활동인구 × 100. <strong>Sahm Rule</strong>: 실업률 3개월 이동평균이 직전 12개월 최저값 대비 0.5%p 이상 상승 → 경기침체 이미 시작됐을 가능성 높음.</p><table class="signal-table"><tr><th>수준</th><th>판단</th></tr><tr><td>3.5~4%</td><td>완전고용</td></tr><tr><td>4~5%</td><td>완만한 냉각</td></tr><tr><td>5%+</td><td>경기 둔화</td></tr><tr><td>6%+ 급등</td><td>경기침체 진행</td></tr></table></div>
+    <div class="lang-en"><p>Unemployed ÷ labor force × 100. Released with the monthly jobs report. <strong>Sahm Rule:</strong> if the 3-month average unemployment rate rises ≥0.5%pt above its 12-month low, a recession has likely already begun — historically 100% accurate.</p><table class="signal-table"><tr><th>Level</th><th>Reading</th></tr><tr><td>3.5–4%</td><td>Full employment (historically low)</td></tr><tr><td>4–5%</td><td>Gradual cooling</td></tr><tr><td>Above 5%</td><td>Slowdown confirmed</td></tr><tr><td>Above 6% (rapid rise)</td><td>Recession underway</td></tr></table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">M2 Money Supply — M2 통화량</span>
+      <span class="card-title lang-en">M2 Money Supply</span>
+      <span class="card-ticker">FRED: M2SL (USD billions)</span>
+    </div>
+    <div class="lang-ko"><p>현금(M1) + 저축예금 + MMF + 정기예금 등. "돈의 총량". <strong>M2 YoY 증가</strong> → 유동성 풍부, 자산 가격 지지. <strong>M2 YoY 감소(마이너스)</strong> → 자산 가격 하락 압력. 2020~21년 25% 폭등 → 자산 급등 및 인플레이션의 원인으로 지목.</p></div>
+    <div class="lang-en"><p>Cash (M1) + savings deposits + money market funds + small time deposits — the broadest measure of money in the economy. <strong>M2 YoY rising</strong> → abundant liquidity, supports asset prices. <strong>M2 YoY negative</strong> → liquidity contraction, asset price pressure. 2020–21 M2 surged 25% → cited as a cause of both the asset boom and subsequent inflation.</p></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 한국 거시경제 ════ -->
+<section class="section" id="kr-macro">
+  <div class="section-title"><span class="lang-ko">🇰🇷 한국 거시경제 (Korea Macro)</span><span class="lang-en">🇰🇷 Korea Macroeconomics</span></div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">한국은행(BOK) 기준금리</span>
+      <span class="card-title lang-en">Bank of Korea (BOK) Policy Rate</span>
+      <span class="card-ticker">Real-time: ecos.bok.or.kr</span>
+    </div>
+    <div class="lang-ko"><p>금통위가 연 8회 결정하는 단기 정책금리. 대시보드 지표 <code>FRED: IR3TIB01KRM156N</code>(3개월 국고채 금리)은 대리지표(Proxy)임. <strong>BOK vs Fed 차이:</strong> BOK는 "물가 안정 + 금융 안정(가계부채)"을 모두 고려 → Fed보다 금리 조정이 신중하다.</p><table class="signal-table"><tr><th>시기</th><th>기준금리</th><th>배경</th></tr><tr><td>2020~2021년</td><td>0.5%</td><td>코로나 부양</td></tr><tr><td>2022~2023년</td><td>3.5%</td><td>인플레 대응</td></tr><tr><td>중립 금리 추정</td><td>1.5~2.5%</td><td>균형 수준</td></tr></table></div>
+    <div class="lang-en"><p>Short-term policy rate decided 8 times/year by the BOK Monetary Policy Committee. Dashboard proxy: <code>FRED: IR3TIB01KRM156N</code> (3M T-bill). <strong>BOK vs Fed difference:</strong> The Fed has a Dual Mandate (price stability + max employment); BOK adds <strong>financial stability</strong> (household debt, property prices) as an informal third objective — making it slower to hike or cut than the Fed.</p><table class="signal-table"><tr><th>Period</th><th>Rate</th><th>Context</th></tr><tr><td>2020–21</td><td>0.5%</td><td>COVID stimulus</td></tr><tr><td>2022–23</td><td>Hiked to 3.5%</td><td>Global inflation fight</td></tr><tr><td>Neutral rate est.</td><td>1.5–2.5%</td><td>Growth-inflation balance</td></tr></table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">한국 CPI — 데이터 출처별 최신성 비교</span>
+      <span class="card-title lang-en">Korea CPI — Data Timeliness by Source</span>
+    </div>
+    <div class="lang-ko"><div class="warning">대시보드 한국 CPI (<code>FRED: KORCPIALLMINMEI</code>)는 OECD 경유 데이터로 <strong>약 1~1.5년 지연</strong>이 있다. 실시간 정책 판단에 사용 금지.</div><table class="signal-table"><tr><th>출처</th><th>최신성</th><th>접근</th></tr><tr><td>통계청 (KOSIS)</td><td>매월 초</td><td>kosis.kr</td></tr><tr><td>한국은행 ECOS</td><td>매월 갱신</td><td>ecos.bok.or.kr</td></tr><tr><td>FRED KORCPIALLMINMEI</td><td>~1~1.5년 지연</td><td>추세 참고용</td></tr></table></div>
+    <div class="lang-en"><div class="warning">Dashboard Korea CPI (<code>FRED: KORCPIALLMINMEI</code>) uses OECD-relayed data with a <strong>~1–1.5 year lag</strong>. Do NOT use for real-time policy analysis.</div><table class="signal-table"><tr><th>Source</th><th>Timeliness</th><th>Access</th></tr><tr><td>Statistics Korea (KOSIS)</td><td>Released early each month</td><td>kosis.kr</td></tr><tr><td>BOK ECOS</td><td>Monthly updates</td><td>ecos.bok.or.kr</td></tr><tr><td>FRED KORCPIALLMINMEI</td><td>~1–1.5yr lag</td><td>Trend reference only</td></tr></table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">한국 가계부채 — 구조적 제약</span>
+      <span class="card-title lang-en">Korea Household Debt — Structural Constraint</span>
+    </div>
+    <div class="lang-ko"><p>한국 가계부채는 GDP 대비 약 100%+로 OECD 최고 수준 → BOK 통화정책의 근본적 제약. 금리 인상 → 이자 부담 급증 → 소비 위축 + 부동산 폭락 위험.</p><div class="highlight"><strong>한미 금리차 확대 → 원화 약세 압력.</strong> 2022~23년 미국 5.5%, BOK 3.5% → 금리차 2%p+ → USD/KRW 1,400원 돌파.</div><table class="signal-table"><tr><th>한미 금리차</th><th>원화 압력</th></tr><tr><td>0%+ (한국이 높음)</td><td>압력 낮음</td></tr><tr><td>-1% 이내</td><td>중립</td></tr><tr><td>-1% 이하</td><td>약세 압력 강함</td></tr></table></div>
+    <div class="lang-en"><p>Korea's household debt-to-GDP ratio exceeds 100% — among the highest in the OECD — a fundamental constraint on BOK policy. Hiking rates → sharply higher interest payments → consumption shrinks + risk of housing price crash.</p><div class="highlight"><strong>US-Korea rate differential → KRW weakness.</strong> 2022–23: US hiked to 5.5%, BOK stopped at 3.5% → 2%pt+ gap → USD/KRW broke ₩1,400. A wider gap pushes foreign capital toward the US, weakening KRW.</div><table class="signal-table"><tr><th>Korea−US Rate Diff.</th><th>KRW Pressure</th></tr><tr><td>Positive (Korea higher)</td><td>Low pressure</td></tr><tr><td>Within −1%</td><td>Neutral</td></tr><tr><td>Below −1%</td><td>Strong weakness pressure</td></tr></table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">한국 무역수지 & 수출 — 경기 체온계</span>
+      <span class="card-title lang-en">Korea Trade Balance & Exports — Economic Thermometer</span>
+      <span class="card-ticker">Real-time: Korea Customs Service (1st of month: final / 21st: preliminary)</span>
+    </div>
+    <div class="lang-ko">
+    <p>수출 흑자 확대 → 달러 공급 증가 → 원화 강세 → KOSPI 외국인 유입. 적자 → 원화 약세 압력. 반도체(약 20%), 자동차·배터리, 석유화학 + 중국 수출 비중 약 25%.</p>
+    <p><strong>반도체 수출 증감률</strong>이 KOSPI 단기 방향 선행 지표로 자주 활용됨.</p>
+    <div class="warning">현재 대시보드에 무역수지 지표 없음. 실시간: 관세청(customs.go.kr) 또는 한국은행 ECOS.</div>
+    </div>
+    <div class="lang-en">
+    <p>Trade surplus expanding → more dollar inflows → KRW strengthens → foreign buying of KOSPI. Deficit → KRW weakens. Key exports: semiconductors (~20%), autos/batteries, petrochemicals; China accounts for ~25% of exports.</p>
+    <p><strong>Semiconductor export growth rate</strong> is widely used as a short-term KOSPI leading indicator.</p>
+    <div class="warning">The dashboard does not currently include a trade balance indicator. Check customs.go.kr (Korea Customs Service) or BOK ECOS for real-time data.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 한국 부동산 ════ -->
+<section class="section" id="kr-realty">
+  <div class="section-title"><span class="lang-ko">🏢 한국 부동산 (아파트 가격지수)</span><span class="lang-en">🏢 Korea Real Estate (Apartment Price Index)</span></div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">아파트 매매가격지수</span>
+      <span class="card-title lang-en">Apartment Sale Price Index</span>
+      <span class="card-ticker">Korea Real Estate Board (R-ONE API) — National/Metro/Seoul/Regions</span>
+    </div>
+    <div class="lang-ko"><p>한국부동산원 월간 아파트 매매 가격 상대 지수 (2017년 11월 = 100). 지역별로 움직임이 다르므로 서울·수도권과 지방권을 구분해서 봐야 한다. 절대 가격이 아닌 추세(방향, 속도)를 읽는 데 적합.</p></div>
+    <div class="lang-en"><p>Monthly apartment sale price index from the Korea Real Estate Board (base: Nov 2017 = 100). Regional divergence is common — Seoul/metro areas often move first and more sharply than other regions. Use the index for trend direction and momentum, not absolute price levels.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">아파트 전세가격지수</span>
+      <span class="card-title lang-en">Apartment Jeonse (Lease Deposit) Price Index</span>
+      <span class="card-ticker">Korea Real Estate Board (R-ONE API) — National/Metro/Seoul/Regions</span>
+    </div>
+    <div class="lang-ko"><p>전세(보증금 맡기고 월세 없이 거주하는 한국 특유의 임대 형태) 가격 상대 지수. 입주 물량이 늘면 하락, 품귀 현상이 생기면 급등하는 경향. 전세 급락 → 역전세 위험(집주인이 보증금 반환 어려움) → 주택 시장 불안정.</p></div>
+    <div class="lang-en"><p>Index for jeonse prices — Korea's unique rental system where a tenant pays a lump-sum deposit (no monthly rent). The index reflects rental supply-demand balance. More new supply → index falls; shortage → surges. A sharp jeonse decline creates "reverse jeonse risk" where landlords struggle to return deposits, destabilizing the housing market.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">전세가율 (전세가격지수 / 매매가격지수 × 100)</span>
+      <span class="card-title lang-en">Jeonse-to-Sale Price Ratio</span>
+    </div>
+    <div class="lang-ko"><p>매매가 대비 전세가의 비율. 높을수록 갭투자 활발, 낮을수록 안정적.</p><table class="signal-table"><tr><th>전세가율</th><th>의미</th></tr><tr><td>50% 이하</td><td>상대적 안전</td></tr><tr><td>50~70%</td><td>주의</td></tr><tr><td>70%+</td><td>위험 (갭투자 횡행, 전세사기 위험)</td></tr></table><div class="warning">대시보드의 전세가율은 가격지수 기반 → 실제 거래 기준과 수치 다를 수 있음. 절대 수치는 KB국민은행 또는 부동산원 공식 통계 참고.</div></div>
+    <div class="lang-en"><p>Jeonse price index ÷ sale price index × 100. Higher ratio → more gap investing (buying a home with a tenant's deposit as financing). Lower → more stable rental market.</p><table class="signal-table"><tr><th>Ratio</th><th>Meaning</th></tr><tr><td>Below 50%</td><td>Relatively safe</td></tr><tr><td>50–70%</td><td>Caution zone</td></tr><tr><td>Above 70%</td><td>Danger (rampant gap-investing, jeonse fraud risk)</td></tr></table><div class="warning">The dashboard ratio is index-based and may differ from actual transaction-based figures. Use for trend direction; for absolute levels, refer to KB Kookmin Bank or Korea Real Estate Board official statistics.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title lang-ko">API 연결 실패 시 — 대안 데이터 출처</span>
+      <span class="card-title lang-en">API Failure — Alternative Data Sources</span>
+    </div>
+    <div class="lang-ko"><div class="warning">R-ONE API 연결 간헐적 문제 발생 가능. 아래 출처에서 직접 확인 가능.</div><table class="signal-table"><tr><th>출처</th><th>데이터</th><th>특징</th></tr><tr><td>한국부동산원 R-ONE</td><td>매매·전세가격지수 공식</td><td>월간 갱신</td></tr><tr><td>KB부동산 (kbland.kr)</td><td>KB주택가격동향</td><td>실거래 기반 지수 제공</td></tr><tr><td>한국은행 ECOS</td><td>주택·전세가격지수</td><td>ecos.bok.or.kr</td></tr><tr><td>국토교통부 실거래가</td><td>아파트 실거래가 (건별)</td><td>rt.molit.go.kr</td></tr></table></div>
+    <div class="lang-en"><div class="warning">The R-ONE API may experience intermittent connectivity issues. Use the sources below to access the same data directly.</div><table class="signal-table"><tr><th>Source</th><th>Data</th><th>Notes</th></tr><tr><td>Korea Real Estate Board R-ONE</td><td>Official sale/jeonse price indices</td><td>Monthly, no login required</td></tr><tr><td>KB Kookmin Bank (kbland.kr)</td><td>KB Housing Price Trends</td><td>Also provides transaction-based index</td></tr><tr><td>BOK ECOS</td><td>Housing/jeonse price indices</td><td>ecos.bok.or.kr</td></tr><tr><td>MOLIT Real Transaction Price System</td><td>Individual apartment transaction prices</td><td>rt.molit.go.kr — raw data</td></tr></table></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ Phase 고정 섹션 ════ -->
+<section class="section" id="phase1">
+  <div class="section-title"><span class="lang-ko">📌 Phase 1 — Global Markets (고정 섹션)</span><span class="lang-en">📌 Phase 1 — Global Markets (Fixed Section)</span></div>
+  <div class="card">
+    <p style="color:var(--muted);font-size:0.88rem;"><span class="lang-ko">사이드바 기간 선택기로 전체 조회 기간 조정 가능. 아래 5개 섹션이 항상 표시된다.</span><span class="lang-en">Adjust the period via the sidebar selector. The 5 sections below are always displayed.</span></p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">💱 환율 (Exchange Rate)</span></div>
+    <p>USD/KRW, EUR/KRW를 나란히 보여준다. 기간 내 등락률(%)과 시계열 차트를 함께 제공한다.</p>
+    <p><strong>보는 법:</strong> 두 환율이 동시에 상승 중이면 원화 전반적 약세. USD/KRW만 오르고 EUR/KRW는 안정이면 달러 강세(DXY 상승) 효과. EUR/KRW가 더 많이 오르면 유럽발 이슈가 원인일 가능성.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">🥇 Gold / Silver Ratio</span></div>
+    <p>금 가격(USD/oz), 은 가격(USD/oz), 금/은 비율을 동시에 표시. 기준선: <strong>80 = 역사적 고점</strong>(은 저평가 또는 극단적 공포), <strong>50 = 역사적 평균</strong>.</p>
+    <p><strong>보는 법:</strong> 금은비율이 빠르게 상승하면서 동시에 VIX도 오르면 → 시장 전체가 안전자산으로 이동 중. 금은비율이 하락하면서 구리도 오른다면 → 경기 확장 사이클 신호. 금만 오르고 은은 제자리면 → 순수 안전자산 수요(경기 우려는 있지만 리스크 오프 아직 아님).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">📈 Major Indices (S&P 500 / KOSPI / NASDAQ)</span></div>
+    <p>세 지수를 나란히 비교. 기간 내 등락률과 개별 차트를 제공한다.</p>
+    <p><strong>보는 법:</strong> 세 지수가 모두 같은 방향이면 글로벌 매크로 이슈(금리, 달러 등). S&P 500은 오르는데 KOSPI만 빠진다면 → 한국 특수 요인(반도체 사이클 역행, 원화 약세, 외국인 매도). NASDAQ이 S&P 500보다 크게 오른다면 → 성장주 선호, 금리 하락 기대 장세.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">😨 VIX Fear Index — 공포지수</span></div>
+    <p>현재 VIX 수치와 시계열 차트. 기준선: <strong>20 (주의)</strong>, <strong>30 (공포)</strong>.</p>
+    <p><strong>보는 법:</strong> 대시보드의 VIX 섹션은 현재 시장 심리의 스냅샷이다. VIX가 20 아래에서 횡보하는 중이라면 시장이 전반적으로 안도·낙관 상태. 갑자기 30을 넘어 스파이크하면 — 그 순간 주식이 급락 중이라는 뜻이다.</p>
+    <div class="highlight"><strong>실전 활용:</strong> VIX 30 이상 → 공포 매도가 정점에 가까울 수 있다. 역사적으로 VIX 40~80 구간에서 분할 매수를 시작한 투자자들이 수익을 거뒀다. 단, VIX가 40이 되더라도 더 오를 수 있으므로(2008년 89, 2020년 85) 분할 진입이 원칙.</div>
+    <p>더 자세한 설명 → <a href="#vix" style="color:var(--accent);">VIX 전체 설명 카드</a> 참조.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">🛢️ Oil Price (WTI)</span></div>
+    <p>WTI 원유 선물 가격(USD/배럴). 기간 내 등락률과 차트를 제공한다.</p>
+    <p><strong>보는 법:</strong> 유가가 빠르게 오르면서 달러도 강세 → 공급 충격(지정학적 이슈) 가능성. 유가가 오르면서 달러는 약세 → 수요 측 경기 회복 신호. 유가가 급락하면서 주식도 떨어진다면 → 경기 침체 우려(수요 붕괴). 유가 급락하는데 주식은 오른다면 → 공급 과잉 또는 기술 전환 기대.</p>
+  </div>
+</section>
+
+<section class="section" id="phase2">
+  <div class="section-title"><span class="lang-ko">📌 Phase 2 — US Macro (고정 섹션)</span><span class="lang-en">📌 Phase 2 — US Macro (Fixed Section)</span></div>
+  <div class="card">
+    <p style="color:var(--muted);font-size:0.88rem;"><span class="lang-ko">FRED API 데이터 기반. 연준 정책 방향을 읽는 핵심 4개 차트.</span><span class="lang-en">FRED API data. 4 key charts for reading Fed policy direction.</span></p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">📉 US Interest Rate vs CPI</span></div>
+    <p>연준 기준금리(FEDFUNDS, 좌축 실선)와 CPI YoY%(우축 점선)를 이중축 차트로 비교. <strong>Fed 2% 목표선</strong> 포함.</p>
+    <p><strong>보는 법:</strong></p>
+    <p>① <strong>금리 &lt; CPI</strong> (실질금리 음수): 연준이 인플레를 쫓아가지 못하는 상태. 아직 긴축 여력 있거나, 의도적으로 완화적 기조 유지 중.</p>
+    <p>② <strong>금리 &gt; CPI</strong> (실질금리 양수): 금리가 물가보다 높아 실질적인 긴축 효과 발생. 역사적으로 이 상태가 지속되면 경기 냉각·침체 위험 증가.</p>
+    <p>③ <strong>CPI가 꺾이면서 금리도 곧 인하</strong>: 연준 피벗 기대 → 채권 강세, 주식 반등 선행 신호.</p>
+    <div class="highlight">2022~2023년: CPI 9%대까지 치솟은 후 금리를 5.5%까지 올렸으나 실질금리는 한동안 음수였다. 2024년부터 CPI가 3%대로 하락하며 금리가 CPI를 역전 → 피벗(금리 인하) 사이클 진입.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">💵 M2 Money Supply</span></div>
+    <p>M2 통화량 절대값(좌축)과 M2·M1 YoY 성장률(우축 점선). <strong>0% YoY 기준선</strong> 포함.</p>
+    <p><strong>M1 vs M2 차이:</strong> M1 = 현금 + 요구불예금 (즉시 사용 가능한 돈). M2 = M1 + 저축예금 + 머니마켓펀드 + 소액 정기예금 (약간의 시간이 필요한 돈). M2가 더 광의의 유동성 지표다.</p>
+    <p><strong>보는 법:</strong> M2 YoY가 플러스면 시중 유동성 증가 → 자산 가격 지지. 마이너스면 유동성 수축 → 자산 가격 하락 압력. 역사적으로 M2 YoY가 -2% 이하로 내려간 사례는 드물며, 그때마다 자산 시장 조정이 왔다. 2022~2023년 M2 YoY -4%대 기록 → 주식·채권 동반 하락.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">📊 US GDP Growth (Real)</span></div>
+    <p>미국 실질 GDP 수준(좌 패널)과 QoQ·YoY 성장률 막대(우 패널). <strong>0% 기준선</strong> 포함(음수 = 역성장).</p>
+    <p><strong>QoQ vs YoY:</strong> QoQ(전분기 대비)는 단기 모멘텀. YoY(전년 동분기 대비)는 추세. 2분기 연속 QoQ 역성장 = 기술적 침체(technical recession). 단, NBER의 공식 침체 판정은 고용·소비 등 다양한 지표를 종합해 결정하므로 다를 수 있다.</p>
+    <p><strong>보는 법:</strong> QoQ 막대가 연속으로 음수(빨간색) → 기술적 침체 진입. YoY 선이 하락 추세이지만 아직 양수 → 성장 둔화 국면. GDP 발표는 분기마다 한 번이므로 최신성이 낮다. 따라서 GDP보다 고용·소비 등 월간 지표를 먼저 보고 GDP로 확인하는 방식이 일반적이다.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">💲 Dollar Index (DXY)</span></div>
+    <p>달러 강도 지수. <strong>100 기준선</strong> 포함. 현재 수치에 따라 강달러/보통/약달러 판정 표시.</p>
+    <p><strong>보는 법:</strong> DXY가 빠르게 상승하면 → 원자재(금·유가) 하락 압력, 신흥국 통화 동반 약세, KOSPI 외국인 매도 가능성. DXY가 하락 전환하면 → 원자재 반등, 신흥국 강세. <strong>DXY 방향 전환점</strong>은 연준 금리 결정(FOMC)에서 나오는 경우가 많다. 금리 인상 종료·인하 신호 → DXY 고점.</p>
+    <div class="highlight">2022년 DXY 114까지 치솟으며 KOSPI, 원자재 모두 하락. 2023년부터 DXY 하락 전환하자 KOSPI, 금, 신흥국 자산 반등 시작. DXY 방향이 바뀌면 한국 투자자는 포트폴리오 재점검 신호로 삼을 수 있다.</div>
+  </div>
+</section>
+
+<section class="section" id="phase3">
+  <div class="section-title"><span class="lang-ko">📌 Phase 3 — Korea (고정 섹션)</span><span class="lang-en">📌 Phase 3 — Korea (Fixed Section)</span></div>
+  <div class="card">
+    <p style="color:var(--muted);font-size:0.88rem;"><span class="lang-ko">한국 통화·부동산·주식 흐름을 한곳에서 파악.</span><span class="lang-en">Covers Korean monetary policy, real estate, and equity flows in one view.</span></p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">🏛️ Korea Rate vs CPI</span></div>
+    <p>한국 3개월 국고채 금리(IR3TIB01KRM156N, BOK 기준금리 대리지표)와 한국 CPI YoY%를 이중축 비교. <strong>BOK 2% 목표선</strong> 포함.</p>
+    <p><strong>데이터 한계 주의:</strong> FRED의 한국 CPI(KORCPIALLMINMEI)는 OECD가 제공하는 데이터로 약 1~1.5년 지연이 있다. 실시간 한국 CPI는 통계청 공식 발표 또는 한국은행 경제통계시스템(ECOS)에서 확인해야 한다.</p>
+    <p><strong>보는 법:</strong> 금리가 CPI보다 높으면 긴축적 통화정책(실질금리 양수). 낮으면 완화적. BOK는 미국 연준보다 금리 인상 속도가 느리고, 주택 시장과 가계 부채를 동시에 고려하므로 Fed보다 더 신중하게 움직이는 경향이 있다.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">🏢 아파트 가격지수 + 전세가율</span></div>
+    <p>한국부동산원 R-ONE API로 매매·전세가격지수(전국/수도권/서울/지방권)를 조회. API 연결이 되어야 표시된다.</p>
+    <p><strong>현재 상태:</strong> R-ONE API(www.reb.or.kr/r-one/openapi/) 인증 키 문제로 연결 실패 중. 연결되면 매매/전세 이중 패널 차트와 YoY 등락률이 자동으로 표시된다.</p>
+    <p><strong>전세가율 해석:</strong> 지수 기반이므로 절대 수치가 실거래 전세가율(KB·부동산원 공식 통계)과 다를 수 있다. 방향과 추세를 보는 데 활용하고, 절대 위험선(70%) 판단은 공식 통계를 참고할 것.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">📊 KOSPI / KOSDAQ</span></div>
+    <p>두 지수를 나란히 비교. 기간 내 등락률로 <strong>강세(+5% 이상) / 보합(±5%) / 약세(-5% 이하)</strong> 자동 판정.</p>
+    <p><strong>보는 법:</strong> KOSPI가 강세인데 KOSDAQ이 약세라면 → 대형 수출주(반도체·자동차) 장세, 중소·성장주 소외. 반대로 KOSDAQ이 KOSPI를 아웃퍼폼한다면 → 개인투자자 중심 테마·바이오 강세 또는 금리 인하 기대 반영. 두 지수 모두 약세라면 → 외국인 자금 이탈(원화 약세와 동시에 나타남) 또는 글로벌 침체 우려.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 상관관계 ════ -->
+<section class="section" id="correlation">
+  <div class="section-title"><span class="lang-ko">🔗 지표 간 상관관계 — 같이 보면 의미가 살아나는 조합</span><span class="lang-en">🔗 Cross-Indicator Correlations — Powerful Combinations</span></div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">달러(DXY) ↔ 원자재·신흥국</span><span class="card-title lang-en">DXY ↔ Commodities &amp; Emerging Markets</span></div>
+    <div class="lang-ko"><p>달러와 원자재는 <strong>역방향</strong> 관계. 달러 강세 → 금·유가·구리 하락, 신흥국 통화 약세.</p><p><strong>Master Chart:</strong> DXY + Gold + WTI + USD/KRW 동시 켜기 → DXY 고점 이후 반등 패턴 확인.</p></div>
+    <div class="lang-en"><p>Dollar and commodities are strongly <strong>inversely</strong> correlated. Stronger dollar → lower gold, oil, copper prices; weaker EM currencies (including KRW).</p><p><strong>Master Chart:</strong> Enable DXY + Gold + WTI + USD/KRW together → watch commodities and KRW bounce when DXY peaks and turns down.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">금리(10Y) ↔ 성장주(NASDAQ) ↔ 금</span><span class="card-title lang-en">10Y Yield ↔ NASDAQ ↔ Gold</span></div>
+    <div class="lang-ko"><p>세 자산 모두 실질금리와 연결. <strong>금리 상승 → NASDAQ·금 동시 약세</strong>, <strong>금리 하락 → 동시 강세</strong>. 단, 경기 호황발 금리 상승은 NASDAQ에 덜 부정적.</p><p><strong>Master Chart:</strong> US 10Y(우축 점선) + NASDAQ + Gold → 2022년 금리 급등 시 동반 하락 패턴 확인.</p></div>
+    <div class="lang-en"><p>All three assets are deeply linked to real interest rates. <strong>Rates rising → NASDAQ &amp; Gold both weaken; rates falling → both strengthen.</strong> Exception: rate rises driven by strong growth are less negative for NASDAQ than inflation-driven rises.</p><p><strong>Master Chart:</strong> US 10Y (right-axis dashed) + NASDAQ + Gold → the 2022 surge shows a textbook parallel decline.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">VIX ↔ HY 스프레드 ↔ S&P 500</span><span class="card-title lang-en">VIX ↔ HY Spread ↔ S&P 500</span></div>
+    <div class="lang-ko"><p>"시장 공포의 삼각형." VIX 급등 + HY 스프레드 확대 + S&P 하락 → 진짜 위기 신호. VIX만 오르고 HY 스프레드 안정 → 일시적 노이즈.</p><p><strong>Master Chart:</strong> VIX + HY Spread + S&P 500 동시 켜기. VIX는 우축 점선 스파이크로 확인.</p></div>
+    <div class="lang-en"><p>"The triangle of market fear." When all three point the same direction, signal reliability is high. VIX spikes + HY spread widens + S&P falls → genuine crisis signal. VIX rises but HY spread is stable → likely temporary equity noise.</p><p><strong>Master Chart:</strong> Enable VIX + HY Spread + S&P 500 together. VIX is plotted on the right axis as a dashed line — easy to spot spikes.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">Yield Curve ↔ 경기선행지수들</span><span class="card-title lang-en">Yield Curve ↔ Leading Indicators</span></div>
+    <div class="lang-ko"><p>장단기 금리 역전 + Jobless Claims 상승 + Consumer Sentiment 하락이 동시에 나타나면 침체 가능성 매우 높음. 단독으로는 노이즈일 수 있지만 셋이 모두 나쁘면 신호 강도가 배가됨.</p><p><strong>Master Chart:</strong> Yield Curve + Jobless Claims + Consumer Sentiment, 5~10년 기간 + 경기침체 음영 → 침체 직전 패턴 확인.</p></div>
+    <div class="lang-en"><p>Inverted yield curve + rising jobless claims + falling consumer sentiment occurring simultaneously = very high recession probability. Each alone may be noise, but all three together multiplies signal strength.</p><p><strong>Master Chart:</strong> Enable Yield Curve + Jobless Claims + Consumer Sentiment over a 5–10 year period with recession shading → recurring pre-recession patterns become clear.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">SOX ↔ KOSPI ↔ 삼성전자</span><span class="card-title lang-en">SOX ↔ KOSPI ↔ Samsung</span></div>
+    <div class="lang-ko"><p>한국 투자자에게 가장 중요한 조합 중 하나. SOX(필라델피아 반도체지수)가 선행하고, KOSPI·삼성전자가 따라가는 경향. SOX가 바닥 반등 → KOSPI 회복 선행 신호.</p><p><strong>Master Chart:</strong> SOX + KOSPI + 삼성전자 동시 켜기. 같은 기준점으로 먼저 바닥 친 종목 비교 가능.</p></div>
+    <div class="lang-en"><p>One of the most important combos for Korean investors. The Philadelphia Semiconductor Index (SOX) tends to lead, followed by KOSPI and Samsung. SOX bottoming and rebounding is a leading signal for Korean market recovery.</p><p><strong>Master Chart:</strong> Enable SOX + KOSPI + Samsung. Set the same base date to compare who bottomed first.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">Fed 유동성(Net Liquidity) ↔ 위험자산</span><span class="card-title lang-en">Fed Net Liquidity ↔ Risk Assets</span></div>
+    <div class="lang-ko"><p>Fed 순유동성(WALCL - RRP - TGA)은 S&P 500, 비트코인과 높은 상관관계를 보여왔다. 순유동성 증가 → 위험자산 상승.</p><p><strong>Master Chart:</strong> Net Liquidity + S&P 500 + Bitcoin 동시 켜기. 단, 상관관계이지 인과관계가 아님에 주의.</p></div>
+    <div class="lang-en"><p>Fed net liquidity (WALCL − RRP − TGA) has shown high correlation with S&P 500 and Bitcoin. As net liquidity expands, risk assets tend to absorb the inflows and rise.</p><p><strong>Master Chart:</strong> Enable Net Liquidity + S&P 500 + Bitcoin. Observe overlapping expansion/rally periods. Note: correlation, not causation.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">Copper/Gold Ratio ↔ 10Y Yield ↔ 경기</span><span class="card-title lang-en">Copper/Gold Ratio ↔ 10Y Yield ↔ Economy</span></div>
+    <div class="lang-ko"><p>구리/금 비율과 10년 국채 금리는 역사적으로 강한 동행성. 둘 다 "경기 기대"를 반영. 같은 방향 움직임 → 신뢰도 높은 경기 신호.</p><p>구리/금↑ + 10Y↑ → 시장·채권 모두 경기 확장 전망. 구리/금↓ + 10Y↓ → 경기 둔화 경고.</p></div>
+    <div class="lang-en"><p>Copper/gold ratio and 10Y Treasury yields have historically moved in tandem because both reflect "growth expectations." When they agree, the signal is highly reliable.</p><p>Copper/gold ratio rising + 10Y rising → both equity markets and bond markets pricing in expansion. Both falling → slowdown warning.</p></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 차트 사용법 ════ -->
+<section class="section" id="chart-guide">
+  <div class="section-title"><span class="lang-ko">🔧 Master Chart 사용법</span><span class="lang-en">🔧 Master Chart Usage Guide</span></div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">기본 개념</span><span class="card-title lang-en">Core Concept</span></div>
+    <div class="lang-ko"><p>단위가 다른 지표들을 한 차트에서 비교하기 위해 <strong>기준점 정규화</strong>를 사용. 기준점 날짜 값을 100으로 놓고 이후 변화를 퍼센트로 표현.</p><table class="signal-table"><tr><th>축</th><th>표시 지표</th><th>선 스타일</th></tr><tr><td>좌축 (Indexed)</td><td>가격·지수 계열 (금, 주가 등)</td><td>실선</td></tr><tr><td>우축 (% 절대값)</td><td>금리·% 계열 (CPI, 수익률 등)</td><td>점선</td></tr></table></div>
+    <div class="lang-en"><p>To compare indicators with different units (gold price in USD, CPI in %, KOSPI in points) on one chart, the chart uses <strong>base-date normalization</strong> — the value at the base date is set to 100, and all subsequent values are expressed as % change from that point.</p><table class="signal-table"><tr><th>Axis</th><th>Indicators</th><th>Line Style</th></tr><tr><td>Left (Indexed)</td><td>Prices &amp; indices (gold, equities, etc.)</td><td>Solid</td></tr><tr><td>Right (% absolute)</td><td>Rates &amp; % series (CPI, yields, etc.)</td><td>Dashed</td></tr></table></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">기준점 슬라이더</span><span class="card-title lang-en">Base Date Slider</span></div>
+    <div class="lang-ko"><p>차트 아래 슬라이더를 드래그하면 비교 기준일을 바꿀 수 있다. 예: "코로나 저점(2020년 3월)"을 기준으로 → 이후 각 자산의 회복 폭 비교. "초기화" 버튼 = 조회 기간 시작일이 기준점.</p></div>
+    <div class="lang-en"><p>Drag the slider below the chart to change the base (reference) date. For example, setting "COVID low (March 2020)" as the base lets you compare each asset's recovery from that point. The "Reset" button sets the base to the start of the viewing period.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">경기침체 음영 (USREC)</span><span class="card-title lang-en">Recession Shading (USREC)</span></div>
+    <div class="lang-ko"><p>회색 음영 = NBER 공식 지정 미국 경기침체 기간 (FRED: USREC). 침체 구간에서 각 자산의 움직임을 비교하면 자산별 경기 민감도를 파악할 수 있다.</p></div>
+    <div class="lang-en"><p>Gray shaded areas mark officially designated US recessions per the NBER (FRED: USREC). Comparing how each asset moved during recessions reveals its economic sensitivity and defensive characteristics.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">활용 예시</span><span class="card-title lang-en">Usage Examples</span></div>
+    <div class="lang-ko"><p><strong>예시 1 — 금리 인상기 영향</strong>: 2022년 3월(첫 금리 인상)을 기준점 → NASDAQ + 금 + 비트코인 + 10Y 금리 동시 확인. 금리 상승이 각 자산에 미친 영향 비교.</p><p><strong>예시 2 — 침체 전 신호</strong>: 5~10년 기간 + 경기침체 음영 → HY 스프레드, Yield Curve, VIX의 침체 직전 패턴 관찰.</p><p><strong>예시 3 — 한국 vs 미국</strong>: KOSPI + S&P 500 + SOX → 반도체 사이클에 한국 시장의 연동도 확인.</p></div>
+    <div class="lang-en"><p><strong>Example 1 — Rate Hike Impact</strong>: Set base date to March 2022 (first Fed hike) → enable NASDAQ, Gold, Bitcoin, 10Y yield. Compare how each asset responded to rising rates.</p><p><strong>Example 2 — Pre-Recession Signals</strong>: Set 5–10 year period + recession shading → observe how HY spread, Yield Curve, and VIX behaved immediately before each recession.</p><p><strong>Example 3 — Korea vs US</strong>: Enable KOSPI + S&P 500 + SOX → measure how tightly Korean equities track the semiconductor cycle.</p></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ 발표 일정 ════ -->
+<section class="section" id="release-schedule">
+  <div class="section-title"><span class="lang-ko">📅 주요 경제 지표 발표 일정</span><span class="lang-en">📅 Key Economic Release Schedule</span></div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">🇺🇸 미국 주요 지표 발표 일정</span><span class="card-title lang-en">🇺🇸 US Key Economic Release Schedule</span></div>
+    <table class="signal-table">
+      <tr class="lang-ko"><th>지표</th><th>주기</th><th>발표 시기</th><th>중요도</th></tr>
+      <tr class="lang-en"><th>Indicator</th><th>Frequency</th><th>Release Timing</th><th>Importance</th></tr>
+      <tr><td><span class="lang-ko"><strong>FOMC 금리 결정</strong></span><span class="lang-en"><strong>FOMC Rate Decision</strong></span></td><td><span class="lang-ko">연 8회</span><span class="lang-en">8×/year</span></td><td><span class="lang-ko">1·3·5·6·7·9·11·12월 / 수요일 오후 2시 (현지) → 한국 목요일 새벽 4시</span><span class="lang-en">Jan/Mar/May/Jun/Jul/Sep/Nov/Dec — Wednesday 2pm ET → Thursday 4am KST</span></td><td>★★★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>CPI (소비자물가)</strong></span><span class="lang-en"><strong>CPI (Consumer Price Index)</strong></span></td><td><span class="lang-ko">매월</span><span class="lang-en">Monthly</span></td><td><span class="lang-ko">익월 10~15일 (화 오전 8:30 현지)</span><span class="lang-en">10th–15th of following month (Tue 8:30am ET)</span></td><td>★★★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>고용보고서 (Nonfarm Payroll)</strong></span><span class="lang-en"><strong>Jobs Report (Nonfarm Payroll)</strong></span></td><td><span class="lang-ko">매월</span><span class="lang-en">Monthly</span></td><td><span class="lang-ko">익월 첫째 주 금요일 (오전 8:30 현지)</span><span class="lang-en">First Friday of following month (8:30am ET)</span></td><td>★★★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>PCE (개인소비지출 물가)</strong></span><span class="lang-en"><strong>PCE Inflation (Fed's target)</strong></span></td><td><span class="lang-ko">매월</span><span class="lang-en">Monthly</span></td><td><span class="lang-ko">익월 말 (27~31일)</span><span class="lang-en">End of following month (27th–31st)</span></td><td>★★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>GDP (실질, 분기)</strong></span><span class="lang-en"><strong>GDP (Real, Quarterly)</strong></span></td><td><span class="lang-ko">분기별</span><span class="lang-en">Quarterly</span></td><td><span class="lang-ko">분기 종료 후 약 4주 (1차 속보치)</span><span class="lang-en">~4 weeks after quarter end (advance estimate); revised 2× after</span></td><td>★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>주간 실업급여 청구 (Jobless Claims)</strong></span><span class="lang-en"><strong>Weekly Jobless Claims</strong></span></td><td><span class="lang-ko">매주</span><span class="lang-en">Weekly</span></td><td><span class="lang-ko">목요일 오전 8:30 (현지)</span><span class="lang-en">Thursday 8:30am ET</span></td><td>★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>소비자심리지수 (미시간대)</strong></span><span class="lang-en"><strong>Consumer Sentiment (Univ. Michigan)</strong></span></td><td><span class="lang-ko">매월 2회</span><span class="lang-en">2×/month</span></td><td><span class="lang-ko">두 번째 금요일 (예비), 네 번째 금요일 (확정)</span><span class="lang-en">2nd Friday (preliminary), 4th Friday (final)</span></td><td>★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>PPI (생산자물가)</strong></span><span class="lang-en"><strong>PPI (Producer Price Index)</strong></span></td><td><span class="lang-ko">매월</span><span class="lang-en">Monthly</span></td><td><span class="lang-ko">CPI 발표 다음날 (화 오전 8:30)</span><span class="lang-en">Day after CPI (Tuesday 8:30am ET)</span></td><td>★★★</td></tr>
+    </table>
+    <div class="highlight lang-ko">CPI 발표일에는 채권·주식·달러 변동성이 급등하는 경우가 많다. <strong>FOMC 주간(수요일)</strong>에는 시장이 발표 전 관망 모드로 들어갔다가 발표 후 방향이 정해진다. 의사록 공개(Minutes, 3주 후)도 추가 시장 영향 요인.</div>
+    <div class="highlight lang-en">CPI release days often see sharp spikes in bond, equity, and dollar volatility. On <strong>FOMC Wednesdays</strong>, markets enter a wait-and-see mode before the announcement, then move decisively after. The FOMC Minutes (released 3 weeks later) are also a secondary market catalyst.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">🇰🇷 한국 주요 지표 발표 일정</span><span class="card-title lang-en">🇰🇷 Korea Key Economic Release Schedule</span></div>
+    <table class="signal-table">
+      <tr class="lang-ko"><th>지표</th><th>주기</th><th>발표 시기</th><th>중요도</th></tr>
+      <tr class="lang-en"><th>Indicator</th><th>Frequency</th><th>Release Timing</th><th>Importance</th></tr>
+      <tr><td><span class="lang-ko"><strong>BOK 금통위 기준금리 결정</strong></span><span class="lang-en"><strong>BOK Policy Rate Decision</strong></span></td><td><span class="lang-ko">연 8회</span><span class="lang-en">8×/year</span></td><td><span class="lang-ko">2·4·5·7·8·10·11·1월 (오전 9시)</span><span class="lang-en">Feb/Apr/May/Jul/Aug/Oct/Nov/Jan — 9am KST</span></td><td>★★★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>한국 CPI (통계청)</strong></span><span class="lang-en"><strong>Korea CPI (Statistics Korea)</strong></span></td><td><span class="lang-ko">매월</span><span class="lang-en">Monthly</span></td><td><span class="lang-ko">익월 2~4일 (오전 8시)</span><span class="lang-en">2nd–4th of following month (8am KST)</span></td><td>★★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>수출입 통계 잠정치 (관세청)</strong></span><span class="lang-en"><strong>Trade Stats Preliminary (Customs)</strong></span></td><td><span class="lang-ko">매월</span><span class="lang-en">Monthly</span></td><td><span class="lang-ko">당월 21일 (전월 1~20일분 속보)</span><span class="lang-en">21st of same month (flash for 1st–20th of prior month)</span></td><td>★★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>수출입 통계 확정치 (관세청)</strong></span><span class="lang-en"><strong>Trade Stats Final (Customs)</strong></span></td><td><span class="lang-ko">매월</span><span class="lang-en">Monthly</span></td><td><span class="lang-ko">익월 1일</span><span class="lang-en">1st of following month</span></td><td>★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>한국 GDP (한국은행)</strong></span><span class="lang-en"><strong>Korea GDP (Bank of Korea)</strong></span></td><td><span class="lang-ko">분기별</span><span class="lang-en">Quarterly</span></td><td><span class="lang-ko">분기 종료 후 약 4주 (속보치)</span><span class="lang-en">~4 weeks after quarter end (advance estimate)</span></td><td>★★★</td></tr>
+      <tr><td><span class="lang-ko"><strong>아파트 가격지수 (한국부동산원)</strong></span><span class="lang-en"><strong>Apartment Price Index (Korea Real Estate Board)</strong></span></td><td><span class="lang-ko">매월</span><span class="lang-en">Monthly</span></td><td><span class="lang-ko">익월 초</span><span class="lang-en">Early following month</span></td><td>★★</td></tr>
+    </table>
+    <p class="lang-ko">관세청 수출입 잠정치는 <strong>반도체·자동차 수출 증감률</strong>이 시장 전망에 중요한 선행 신호가 된다. 수출이 예상보다 좋으면 KOSPI에 긍정적, 원화 강세 요인.</p>
+    <p class="lang-en">In the Customs flash data, <strong>semiconductor and auto export growth rates</strong> serve as important leading signals. Exports beating expectations → positive for KOSPI and KRW strength.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title lang-ko">발표 일정 참고 리소스</span><span class="card-title lang-en">Release Calendar Resources</span></div>
+    <div class="badge-row">
+      <span class="badge badge-blue">미국 경제 캘린더</span>
+      <span class="badge badge-blue">한국 통계 캘린더</span>
+    </div>
+    <table class="signal-table">
+      <tr><th>리소스</th><th>용도</th></tr>
+      <tr><td>Investing.com 경제 캘린더</td><td>미국·글로벌 주요 지표 발표 일정 및 예상치</td></tr>
+      <tr><td>한국은행 ECOS (ecos.bok.or.kr)</td><td>한국 금리·물가·통화·국제수지 실시간 통계</td></tr>
+      <tr><td>통계청 KOSIS (kosis.kr)</td><td>한국 CPI, 고용, GDP 공식 통계</td></tr>
+      <tr><td>관세청 (customs.go.kr)</td><td>월별 수출입 현황 (반도체·자동차 세부 품목)</td></tr>
+      <tr><td>FRED (fred.stlouisfed.org)</td><td>미국 거시 지표 전체 (대시보드 데이터 원천)</td></tr>
+    </table>
+  </div>
+</section>
+
+<div style="height:60px;"></div>
+</main>
+
+<script>
+// 스크롤 시 사이드바 활성 링크 업데이트 (section + 개별 card[id] 모두 감지)
+const navLinks = document.querySelectorAll('#sidebar a');
+
+function setActive(id) {
+  navLinks.forEach(a => a.classList.remove('active'));
+  const active = document.querySelector(`#sidebar a[href="#${id}"]`);
+  if (active) active.classList.add('active');
+}
+
+const targets = document.querySelectorAll('section.section, .card[id]');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) setActive(entry.target.id);
+  });
+}, { threshold: 0.25, rootMargin: '0px 0px -40% 0px' });
+
+targets.forEach(t => obs.observe(t));
+
+// 앵커 클릭 시 부드러운 스크롤
+document.querySelectorAll('#sidebar a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const el = document.getElementById(a.getAttribute('href').slice(1));
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setActive(a.getAttribute('href').slice(1));
+  });
+});
+
+// ── Language toggle ────────────────────────────────────────
+function setLang(lang) {
+  document.body.className = (document.body.className || '')
+    .replace(/lang-\w+/g, '').trim() + ' lang-' + lang;
+  localStorage.setItem('indicator_lang', lang);
+  document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+}
+(function () {
+  var saved = localStorage.getItem('indicator_lang') || 'ko';
+  setLang(saved);
+})();
+</script>
+</body>
+</html>

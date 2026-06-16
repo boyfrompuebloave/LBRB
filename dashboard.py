@@ -181,20 +181,29 @@ def get_apt_price_index(service_key: str, start_ym: str, end_ym: str):
         return deal_dict, rent_dict, BASE_URL
     return {}, {}, None
 
-# ── Period selectors (per phase) ──────────────────────
-_OPTIONS    = ["1mo", "3mo", "6mo", "1y", "2y", "5y"]
-_period_map = {"1mo": 1, "3mo": 3, "6mo": 6, "1y": 12, "2y": 24, "5y": 60}
+# ── Period selector (unified) ─────────────────────────
+_PHASE_OPTIONS = ["1mo", "3mo", "6mo", "1y", "2y", "3y", "5y", "7y", "10y", "15y", "20y", "30y", "max"]
+_PHASE_DAYS    = {
+    "1mo": 31, "3mo": 92, "6mo": 183,
+    "1y": 365, "2y": 730, "3y": 1095, "5y": 1825, "7y": 2555,
+    "10y": 3650, "15y": 5475, "20y": 7300, "30y": 10950, "max": 365 * 40,
+}
 fred_end    = datetime.now()
 
-period_p1 = st.sidebar.selectbox("📌 Phase 1 — Global",   _OPTIONS, index=3)  # default 1y
-period_p2 = st.sidebar.selectbox("📌 Phase 2 — US Macro", _OPTIONS, index=4)  # default 2y
-period_p3 = st.sidebar.selectbox("📌 Phase 3 — Korea",    _OPTIONS, index=3)  # default 1y
+import webbrowser, pathlib
+_html_path = pathlib.Path(__file__).parent / "INDICATORS.html"
+if st.sidebar.button("📖 지표 설명서 열기", use_container_width=True):
+    webbrowser.open(_html_path.as_uri())
+st.sidebar.markdown("---")
 
-_months_back_p1 = _period_map[period_p1]
-_months_back_p2 = _period_map[period_p2]
-_months_back_p3 = _period_map[period_p3]
-
-fred_start_p2 = fred_end - timedelta(days=_months_back_p2 * 30)
+period_all = st.sidebar.select_slider(
+    "📌 기간 설정 (전체 공통)",
+    options=_PHASE_OPTIONS,
+    value="2y",
+)
+period_p1 = period_p2 = period_p3 = period_all
+_months_back_p1 = _months_back_p2 = _months_back_p3 = _PHASE_DAYS[period_all] // 30
+fred_start_p2 = fred_end - timedelta(days=_PHASE_DAYS[period_all])
 
 # ── Sidebar: Master Chart controls ───────────────────
 st.sidebar.markdown("---")
@@ -227,6 +236,30 @@ with st.sidebar.expander("📊 Master Chart", expanded=False):
     st.markdown("---")
     mc_recession = st.checkbox("📍 경기침체 구간 표시 (USREC)", value=True, key="mc_recession")
     st.markdown("**시리즈 선택**")
+    _mc_all_keys = [
+        "mc_recession",
+        "mc_usdkrw", "mc_eurkrw", "mc_usdjpy", "mc_dxy",
+        "mc_gold", "mc_silver", "mc_ratio", "mc_cugold", "mc_wti", "mc_copper", "mc_natgas",
+        "mc_sp500", "mc_nasdaq", "mc_sox", "mc_nikkei", "mc_dax", "mc_sse", "mc_vix", "mc_btc",
+        "mc_kospi", "mc_kosdaq", "mc_samsung",
+        "mc_us10y", "mc_us30y", "mc_yldcrv", "mc_fedrate",
+        "mc_hy_spread", "mc_ig_spread",
+        "mc_walcl", "mc_rrp", "mc_netliq",
+        "mc_icsa", "mc_payems", "mc_umcsent",
+        "mc_houst", "mc_permit", "mc_mortgage30",
+        "mc_cpi", "mc_pce", "mc_ppi", "mc_breakeven", "mc_unrate", "mc_m2",
+        "mc_deal_전국", "mc_deal_수도권", "mc_deal_서울", "mc_deal_지방권",
+        "mc_rent_전국", "mc_rent_수도권", "mc_rent_서울", "mc_rent_지방권",
+    ]
+    _mc_c1, _mc_c2 = st.columns(2)
+    with _mc_c1:
+        if st.button("✅ 전체 ON", key="mc_all_on", use_container_width=True):
+            for _k in _mc_all_keys:
+                st.session_state[_k] = True
+    with _mc_c2:
+        if st.button("⬜ 전체 OFF", key="mc_all_off", use_container_width=True):
+            for _k in _mc_all_keys:
+                st.session_state[_k] = False
 
     st.caption("💱 환율")
     mc_usdkrw  = st.checkbox("USD/KRW",              value=True,  key="mc_usdkrw")
@@ -495,11 +528,13 @@ if mc_kosdaq:  _add("KOSDAQ",            _mc_mkt.get("^KQ11"),     "mediumviolet
 if mc_samsung: _add("삼성전자",            _mc_mkt.get("005930.KS"), "#1428A0",        "KRW")
 # 채권 & 금리 (우축 %)
 if mc_us10y:
-    _s10y = _mc_mkt.get("^TNX") or _mc_us10y_fr
+    _tnx = _mc_mkt.get("^TNX")
+    _s10y = _tnx if (_tnx is not None and not _tnx.empty) else _mc_us10y_fr
     if _s10y is not None and not _s10y.empty:
         _mc_series.append(("US 10Y Yield", _s10y.squeeze(), "navy", "%"))
 if mc_us30y:
-    _s30y = _mc_mkt.get("^TYX") or _mc_us30y_fr
+    _tyx = _mc_mkt.get("^TYX")
+    _s30y = _tyx if (_tyx is not None and not _tyx.empty) else _mc_us30y_fr
     if _s30y is not None and not _s30y.empty:
         _mc_series.append(("US 30Y Yield", _s30y.squeeze(), "midnightblue", "%"))
 if mc_yldcrv and _mc_yldcrv is not None and not _mc_yldcrv.empty:
@@ -663,13 +698,19 @@ else:
     if _has_primary:
         _fig.add_hline(y=100, line_dash="dot",
                        line_color="rgba(128,128,128,0.4)", line_width=1)
-    _fig.update_yaxes(title_text="Indexed (기준점 = 100)", secondary_y=False)
+    _fig.update_yaxes(title_text="Indexed (Base = 100)", secondary_y=False)
     if _has_secondary:
         _fig.update_yaxes(title_text="Rate / % (absolute)", secondary_y=True)
+    _n_series = len(_mc_series)
+    _legend_rows = max(1, (_n_series + 4) // 5)
+    _chart_height = 520 + max(0, (_legend_rows - 1) * 22)
     _fig.update_layout(
-        height=520,
+        height=_chart_height,
         hovermode="x unified",
-        legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0),
+        legend=dict(
+            orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
+            font=dict(size=11),
+        ),
         margin=dict(t=10, b=40, l=60, r=60),
         clickmode="event",
     )
@@ -692,9 +733,9 @@ else:
             key=_rb_key,
         )
     if _rebase_ts is not None:
-        st.caption(f"기준점: **{str(_rb_val)}** = 100 │ 가격·지수: 좌축 │ 금리·%: 우축(점선) │ 회색 음영: 침체 구간")
+        st.caption(f"Base: **{str(_rb_val)}** = 100 │ Price/Index: left axis │ Rate/%: right axis (dotted) │ Gray shading: US recession")
     else:
-        st.caption("기준점: 시작일 = 100 │ 가격·지수: 좌축 │ 금리·%: 우축(점선) │ 회색 음영: 침체 구간")
+        st.caption("Base: period start = 100 │ Price/Index: left axis │ Rate/%: right axis (dotted) │ Gray shading: US recession")
 
 st.divider()
 
