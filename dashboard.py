@@ -16,6 +16,21 @@ st.set_page_config(page_title="Economic Dashboard", layout="wide")
 st.title("📊 Economic Dashboard")
 st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
+st.markdown("""
+<style>
+@media (max-width: 768px) {
+    [data-testid="column"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+    }
+    .stPlotlyChart iframe {
+        min-height: 350px !important;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
+
 # ── FRED API setup ────────────────────────────────────
 FRED_API_KEY = os.getenv("FRED_API_KEY")
 fred = Fred(api_key=FRED_API_KEY)
