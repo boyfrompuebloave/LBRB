@@ -205,10 +205,14 @@ _PHASE_DAYS    = {
 }
 fred_end    = datetime.now()
 
-import webbrowser, pathlib
+import pathlib
+import streamlit.components.v1 as _components
 _html_path = pathlib.Path(__file__).parent / "INDICATORS.html"
 if st.sidebar.button("📖 지표 설명서 열기", use_container_width=True):
-    webbrowser.open(_html_path.as_uri())
+    st.session_state["show_indicators"] = not st.session_state.get("show_indicators", False)
+if st.session_state.get("show_indicators", False):
+    with st.expander("📖 지표 설명서", expanded=True):
+        _components.html(_html_path.read_text(encoding="utf-8"), height=600, scrolling=True)
 st.sidebar.markdown("---")
 
 period_all = st.sidebar.select_slider(
